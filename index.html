@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificación Docente - Malla Flexible</title>
+    <title>Plataforma de Planificación Docente</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,14 +12,48 @@
             margin: 0;
             padding: 20px;
         }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
         h2 { color: #2c3e50; margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
+        
+        /* Sistema de Pestañas */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .tab-button {
+            padding: 12px 24px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            font-weight: bold;
+            cursor: pointer;
+            color: #555;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
             max-width: 1200px;
             margin: 0 auto;
+        }
+        .tab-content.active {
+            display: grid;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 20px;
+            width: 100%;
         }
         .card {
             background: white;
@@ -28,6 +62,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.08);
         }
         .full-width { grid-column: 1 / -1; }
+        
         form { display: flex; flex-direction: column; gap: 10px; }
         label { font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
         input[type="text"], select, button {
@@ -46,6 +81,21 @@
             transition: background-color 0.2s;
         }
         button:hover { background-color: #2980b9; }
+        .btn-danger {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            margin-top: 0;
+        }
+        .btn-danger:hover { background-color: #c0392b; }
+        .btn-warning {
+            background-color: #f39c12;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            margin-top: 0;
+        }
+        .btn-warning:hover { background-color: #d68910; }
+
         .sub-group {
             background: #f8f9fa;
             padding: 12px;
@@ -62,13 +112,41 @@
             font-size: 0.9rem;
             cursor: pointer;
         }
+        
+        /* Barra de Progreso */
+        .progress-box {
+            background: #f1f2f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #dfe4ea;
+        }
+        .progress-bar-bg {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 22px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-bar-fill {
+            background-color: #2ecc71;
+            height: 100%;
+            width: 0%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            line-height: 22px;
+            transition: width 0.5s ease-in-out;
+        }
+
         .error { color: #e74c3c; font-weight: bold; margin-top: 10px; }
         .success { color: #27ae60; font-weight: bold; margin-top: 10px; }
         .warning { color: #f39c12; font-weight: bold; margin-top: 10px; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 5px; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9rem; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.9rem; }
         th { background-color: #f2f2f2; }
     </style>
 </head>
@@ -76,116 +154,150 @@
 
     <h1>Plataforma de Planificación Docente</h1>
 
-    <div class="grid-container">
-        
-        <div class="card">
-            <h2>1. Registrar Estudiante</h2>
-            <form id="form-estudiante">
-                <label for="nombre-estudiante">Nombre del Estudiante:</label>
-                <input type="text" id="nombre-estudiante" required placeholder="Ej. Juan Pérez">
-                <button type="submit">Guardar Estudiante</button>
-            </form>
-            <p id="msg-estudiante"></p>
-        </div>
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab('tab-registro')">1. Registro & Asignaturas</button>
+        <button class="tab-button" onclick="openTab('tab-inscripcion')">2. Inscribir Estudiante</button>
+        <button class="tab-button" onclick="openTab('tab-avance')">3. Estado & Avance de Estudiantes</button>
+    </div>
 
-        <div class="card">
-            <h2>2. Crear Nueva Asignatura</h2>
-            <form id="form-asignatura">
-                <label for="nombre-asignatura">Nombre Asignatura:</label>
-                <input type="text" id="nombre-asignatura" required placeholder="Ej. Física II">
-
-                <label for="nivel-asignatura">Nivel al que pertenece:</label>
-                <select id="nivel-asignatura" required>
-                    <option value="1">Nivel 1</option>
-                    <option value="2">Nivel 2</option>
-                    <option value="3">Nivel 3</option>
-                </select>
-
-                <div class="sub-group">
-                    <h4>Clase Teórica (Obligatoria)</h4>
-                    <div style="display:flex; gap: 5px; flex-wrap: wrap;">
-                        <select id="dia-teoria" required>
-                            <option value="Lunes">Lunes</option>
-                            <option value="Martes">Martes</option>
-                            <option value="Miercoles">Miércoles</option>
-                            <option value="Jueves">Jueves</option>
-                            <option value="Viernes">Viernes</option>
-                        </select>
-                        <select id="bloque-teoria" required>
-                            <option value="19:00-21:00">19:00 - 21:00 hrs (Bloque Completo)</option>
-                            <option value="19:00-20:00">19:00 - 20:00 hrs</option>
-                            <option value="20:00-21:00">20:00 - 21:00 hrs</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="sub-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="check-ejercicios" checked>
-                        Incluir Clase de Ejercicios (Lun - Vie)
-                    </label>
-                    <div id="box-ejercicios" style="display:flex; gap: 5px; margin-top: 8px;">
-                        <select id="dia-ejercicios">
-                            <option value="Lunes">Lunes</option>
-                            <option value="Martes">Martes</option>
-                            <option value="Miercoles" selected>Miércoles</option>
-                            <option value="Jueves">Jueves</option>
-                            <option value="Viernes">Viernes</option>
-                        </select>
-                        <input type="text" value="21:00 - 22:00 hrs" disabled style="background:#e9ecef; width:130px;">
-                    </div>
-                </div>
-
-                <div class="sub-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" id="check-lab">
-                        Incluir Clase de Laboratorio (Sábados)
-                    </label>
-                    <div id="box-lab" style="display:none; gap: 5px; margin-top: 8px;">
-                        <select id="bloque-lab">
-                            <option value="08:00-09:45">08:00 - 09:45 hrs</option>
-                            <option value="09:45-11:30">09:45 - 11:30 hrs</option>
-                            <option value="11:30-13:15">11:30 - 13:15 hrs</option>
-                            <option value="12:45-14:30">12:45 - 14:30 hrs</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit">Guardar Asignatura</button>
-            </form>
-            <p id="msg-asignatura"></p>
-        </div>
-
-        <div class="card">
-            <h2>3. Inscribir Estudiante en Asignatura</h2>
-            <form id="form-inscripcion">
-                <label for="select-estudiante">Seleccionar Estudiante:</label>
-                <select id="select-estudiante" required>
-                    <option value="">-- Cargando... --</option>
-                </select>
-
-                <label for="select-asignatura">Seleccionar Asignatura a Inscribir:</label>
-                <select id="select-asignatura" required>
-                    <option value="">-- Cargando... --</option>
-                </select>
-
-                <button type="submit">Inscribir Asignatura</button>
-            </form>
-            <p id="msg-inscripcion"></p>
-        </div>
-
-        <div class="card full-width">
-            <h2>4. Estado del Estudiante y Horario Inscrito</h2>
-            <div style="max-width: 400px; margin-bottom: 15px;">
-                <label for="analisis-estudiante">Seleccionar Estudiante para consultar:</label>
-                <select id="analisis-estudiante">
-                    <option value="">-- Seleccione un estudiante --</option>
-                </select>
+    <div id="tab-registro" class="tab-content active">
+        <div class="grid-container">
+            <div class="card">
+                <h2>Registrar Estudiante</h2>
+                <form id="form-estudiante">
+                    <label for="nombre-estudiante">Nombre del Estudiante:</label>
+                    <input type="text" id="nombre-estudiante" required placeholder="Ej. Juan Pérez">
+                    <button type="submit">Guardar Estudiante</button>
+                </form>
+                <p id="msg-estudiante"></p>
             </div>
-            
-            <div id="reporte-estudiante"></div>
-        </div>
 
+            <div class="card">
+                <h2>Crear Nueva Asignatura</h2>
+                <form id="form-asignatura">
+                    <label for="nombre-asignatura">Nombre Asignatura:</label>
+                    <input type="text" id="nombre-asignatura" required placeholder="Ej. Física II">
+
+                    <label for="nivel-asignatura">Nivel al que pertenece:</label>
+                    <select id="nivel-asignatura" required>
+                        <option value="1">Nivel 1</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                    </select>
+
+                    <div class="sub-group">
+                        <h4>Clase Teórica (Obligatoria - Lun a Vie)</h4>
+                        <div style="display:flex; gap: 5px; flex-wrap: wrap;">
+                            <select id="dia-teoria" required>
+                                <option value="Lunes">Lunes</option>
+                                <option value="Martes">Martes</option>
+                                <option value="Miercoles">Miércoles</option>
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                            </select>
+                            <select id="bloque-teoria" required>
+                                <option value="19:00-21:00">19:00 - 21:00 hrs (Bloque Completo)</option>
+                                <option value="19:00-20:00">19:00 - 20:00 hrs</option>
+                                <option value="20:00-21:00">20:00 - 21:00 hrs</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sub-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="check-ejercicios" checked>
+                            Incluir Clase de Ejercicios (Lun - Vie)
+                        </label>
+                        <div id="box-ejercicios" style="display:flex; gap: 5px; margin-top: 8px;">
+                            <select id="dia-ejercicios">
+                                <option value="Lunes">Lunes</option>
+                                <option value="Martes">Martes</option>
+                                <option value="Miercoles" selected>Miércoles</option>
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                            </select>
+                            <input type="text" value="21:00 - 22:00 hrs" disabled style="background:#e9ecef; width:130px;">
+                        </div>
+                    </div>
+
+                    <div class="sub-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="check-lab">
+                            Incluir Clase de Laboratorio
+                        </label>
+                        <div id="box-lab" style="display:none; flex-direction:column; gap: 8px; margin-top: 8px;">
+                            <label style="font-size:0.85rem;">Modalidad de Horario:</label>
+                            <select id="modalidad-lab">
+                                <option value="Sabado">Sábados (Bloques Mañana)</option>
+                                <option value="Semana">Lunes a Viernes (21:00 - 22:00 hrs)</option>
+                            </select>
+
+                            <div id="sub-box-lab-sabado" style="display:flex; gap: 5px;">
+                                <select id="bloque-lab-sabado">
+                                    <option value="08:00-09:45">08:00 - 09:45 hrs</option>
+                                    <option value="09:45-11:30">09:45 - 11:30 hrs</option>
+                                    <option value="11:30-13:15">11:30 - 13:15 hrs</option>
+                                    <option value="12:45-14:30">12:45 - 14:30 hrs</option>
+                                </select>
+                            </div>
+
+                            <div id="sub-box-lab-semana" style="display:none; gap: 5px;">
+                                <select id="dia-lab-semana">
+                                    <option value="Lunes">Lunes</option>
+                                    <option value="Martes">Martes</option>
+                                    <option value="Miercoles">Miércoles</option>
+                                    <option value="Jueves">Jueves</option>
+                                    <option value="Viernes" selected>Viernes</option>
+                                </select>
+                                <input type="text" value="21:00 - 22:00 hrs" disabled style="background:#e9ecef; width:130px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit">Guardar Asignatura</button>
+                </form>
+                <p id="msg-asignatura"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-inscripcion" class="tab-content">
+        <div class="grid-container">
+            <div class="card full-width" style="max-width: 600px; margin: 0 auto;">
+                <h2>Inscribir Estudiante en Asignatura</h2>
+                <form id="form-inscripcion">
+                    <label for="select-estudiante">Seleccionar Estudiante:</label>
+                    <select id="select-estudiante" required>
+                        <option value="">-- Cargando... --</option>
+                    </select>
+
+                    <label for="select-asignatura">Seleccionar Asignatura a Inscribir:</label>
+                    <select id="select-asignatura" required>
+                        <option value="">-- Cargando... --</option>
+                    </select>
+
+                    <button type="submit">Inscribir Asignatura</button>
+                </form>
+                <p id="msg-inscripcion"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-avance" class="tab-content">
+        <div class="grid-container">
+            <div class="card full-width">
+                <h2>Estado del Estudiante y Control de Malla</h2>
+                
+                <div style="max-width: 400px; margin-bottom: 20px;">
+                    <label for="analisis-estudiante">Seleccionar Estudiante:</label>
+                    <select id="analisis-estudiante">
+                        <option value="">-- Seleccione un estudiante --</option>
+                    </select>
+                </div>
+
+                <div id="reporte-estudiante"></div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -210,6 +322,15 @@
         let listaEstudiantesLocal = {};
         let listaAsignaturasLocal = {};
 
+        // Control de Pestañas
+        window.openTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(tb => tb.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        };
+
         // Alternar visibilidad de Ejercicios y Laboratorio
         document.getElementById('check-ejercicios').addEventListener('change', function() {
             document.getElementById('box-ejercicios').style.display = this.checked ? 'flex' : 'none';
@@ -219,7 +340,17 @@
             document.getElementById('box-lab').style.display = this.checked ? 'flex' : 'none';
         });
 
-        // Escuchar cambios en tiempo real: Estudiantes
+        document.getElementById('modalidad-lab').addEventListener('change', function() {
+            if (this.value === 'Sabado') {
+                document.getElementById('sub-box-lab-sabado').style.display = 'flex';
+                document.getElementById('sub-box-lab-semana').style.display = 'none';
+            } else {
+                document.getElementById('sub-box-lab-sabado').style.display = 'none';
+                document.getElementById('sub-box-lab-semana').style.display = 'flex';
+            }
+        });
+
+        // Escuchar cambios en tiempo real desde Firestore
         onSnapshot(collection(db, "estudiantes"), (snapshot) => {
             listaEstudiantesLocal = {};
             snapshot.forEach((doc) => {
@@ -229,7 +360,6 @@
             refrescarVista();
         });
 
-        // Escuchar cambios en tiempo real: Asignaturas
         onSnapshot(collection(db, "asignaturas"), (snapshot) => {
             listaAsignaturasLocal = {};
             snapshot.forEach((doc) => {
@@ -267,7 +397,7 @@
             }
         });
 
-        // 2. CREAR ASIGNATURA CON CLASES DINÁMICAS
+        // 2. CREAR ASIGNATURA CON OPCIONES DE LAB FLEXIBLE
         document.getElementById('form-asignatura').addEventListener('submit', async function(e) {
             e.preventDefault();
             const nombre = document.getElementById('nombre-asignatura').value.trim();
@@ -279,14 +409,14 @@
 
             const clases = [];
 
-            // 1. Clase Teórica (Siempre existe)
+            // Teórica
             clases.push({
                 tipo: "Teórica",
                 dia: document.getElementById('dia-teoria').value,
                 bloque: document.getElementById('bloque-teoria').value
             });
 
-            // 2. Clase de Ejercicios (Opcional)
+            // Ejercicios
             if (tieneEjercicios) {
                 clases.push({
                     tipo: "Ejercicios",
@@ -295,213 +425,9 @@
                 });
             }
 
-            // 3. Clase de Laboratorio (Opcional)
+            // Laboratorio
             if (tieneLab) {
-                clases.push({
-                    tipo: "Laboratorio",
-                    dia: "Sabado",
-                    bloque: document.getElementById('bloque-lab').value
-                });
-            }
-
-            try {
-                const docRef = doc(db, "asignaturas", nombre);
-                await setDoc(docRef, {
-                    nombre: nombre,
-                    nivel: nivel,
-                    clases: clases
-                });
-                msg.innerHTML = `<span class="success">Asignatura "${nombre}" guardada correctamente.</span>`;
-                document.getElementById('nombre-asignatura').value = '';
-            } catch (err) {
-                msg.innerHTML = `<span class="error">Error al guardar la asignatura.</span>`;
-                console.error(err);
-            }
-        });
-
-        // Helper para convertir "HH:MM" a minutos
-        function parseMinutes(timeStr) {
-            const [h, m] = timeStr.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        // Función para validar si dos bloques horarios colisionan
-        function hayTopeHorario(dia1, bloqueStr1, dia2, bloqueStr2) {
-            if (dia1 !== dia2) return false;
-
-            const [inicio1, fin1] = bloqueStr1.split('-').map(parseMinutes);
-            const [inicio2, fin2] = bloqueStr2.split('-').map(parseMinutes);
-
-            // Existe traslape si el máximo de los inicios es menor que el mínimo de los fines
-            return Math.max(inicio1, inicio2) < Math.min(fin1, fin2);
-        }
-
-        // 3. INSCRIBIR ASIGNATURA CON DETECCIÓN DE TOPES FLEXIBLE
-        document.getElementById('form-inscripcion').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const estudianteId = document.getElementById('select-estudiante').value;
-            const asignaturaId = document.getElementById('select-asignatura').value;
-            const msg = document.getElementById('msg-inscripcion');
-
-            if (!estudianteId || !listaEstudiantesLocal[estudianteId]) {
-                msg.innerHTML = `<span class="error">Por favor seleccione un estudiante válido.</span>`;
-                return;
-            }
-
-            if (!asignaturaId || !listaAsignaturasLocal[asignaturaId]) {
-                msg.innerHTML = `<span class="error">Por favor seleccione una asignatura válida.</span>`;
-                return;
-            }
-
-            const estudianteData = listaEstudiantesLocal[estudianteId];
-            const asignaturaData = listaAsignaturasLocal[asignaturaId];
-
-            const horariosInscritos = estudianteData.horarios || [];
-
-            // Verificar si la asignatura ya está inscrita
-            const yaInscrita = horariosInscritos.some(h => h.asignatura === asignaturaId);
-            if (yaInscrita) {
-                msg.innerHTML = `<span class="error">El estudiante ya tiene inscrita la asignatura "${asignaturaId}".</span>`;
-                return;
-            }
-
-            // Validar topes entre las clases de la nueva asignatura y las clases ya inscritas
-            let conflicto = null;
-
-            for (let claseNueva of asignaturaData.clases) {
-                for (let inscrita of horariosInscritos) {
-                    if (hayTopeHorario(claseNueva.dia, claseNueva.bloque, inscrita.dia, inscrita.bloque)) {
-                        conflicto = { nueva: claseNueva, existente: inscrita };
-                        break;
-                    }
-                }
-                if (conflicto) break;
-            }
-
-            if (conflicto) {
-                const cn = conflicto.nueva;
-                const ex = conflicto.existente;
-                msg.innerHTML = `<span class="error">¡TOPE DE HORARIO DETECTADO!<br>` +
-                    `La clase de ${cn.tipo} de ${asignaturaId} (${cn.dia} ${cn.bloque} hrs) choca con la clase de ` +
-                    `${ex.tipoClase} de ${ex.asignatura} (${ex.dia} ${ex.bloque} hrs).</span>`;
-                return;
-            }
-
-            // Agregar nuevos bloques al estudiante
-            const nuevosBloques = asignaturaData.clases.map(c => ({
-                asignatura: asignaturaData.nombre,
-                nivel: asignaturaData.nivel,
-                tipoClase: c.tipo,
-                dia: c.dia,
-                bloque: c.bloque
-            }));
-
-            const horarioActualizado = [...horariosInscritos, ...nuevosBloques];
-
-            try {
-                const docRef = doc(db, "estudiantes", estudianteId);
-                await updateDoc(docRef, {
-                    horarios: horarioActualizado
-                });
-                msg.innerHTML = `<span class="success">¡Asignatura "${asignaturaId}" inscrita exitosamente!</span>`;
-            } catch (err) {
-                msg.innerHTML = `<span class="error">Error al inscribir la asignatura.</span>`;
-                console.error(err);
-            }
-        });
-
-        // Actualizar Selects
-        function actualizarSelects() {
-            const selectEst = document.getElementById('select-estudiante');
-            const selectAsig = document.getElementById('select-asignatura');
-            const selectAna = document.getElementById('analisis-estudiante');
-
-            const valEst = selectEst.value;
-            const valAsig = selectAsig.value;
-            const valAna = selectAna.value;
-
-            selectEst.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-            selectAna.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-            for (let id in listaEstudiantesLocal) {
-                selectEst.innerHTML += `<option value="${id}">${id}</option>`;
-                selectAna.innerHTML += `<option value="${id}">${id}</option>`;
-            }
-
-            selectAsig.innerHTML = '<option value="">-- Seleccione una asignatura --</option>';
-            for (let id in listaAsignaturasLocal) {
-                const asig = listaAsignaturasLocal[id];
-                selectAsig.innerHTML += `<option value="${id}">${asig.nombre} (Nivel ${asig.nivel})</option>`;
-            }
-
-            selectEst.value = valEst;
-            selectAsig.value = valAsig;
-            selectAna.value = valAna;
-        }
-
-        // Generar vista de estado del estudiante
-        document.getElementById('analisis-estudiante').addEventListener('change', refrescarVista);
-
-        function refrescarVista() {
-            const estudianteId = document.getElementById('analisis-estudiante').value;
-            const divReporte = document.getElementById('reporte-estudiante');
-
-            if (!estudianteId || !listaEstudiantesLocal[estudianteId]) {
-                divReporte.innerHTML = '';
-                return;
-            }
-
-            const estudiante = listaEstudiantesLocal[estudianteId];
-            const horarios = estudiante.horarios || [];
-
-            const asignaturasInscritas = [...new Set(horarios.map(h => h.asignatura))];
-
-            const asignaturasNivel1Sistema = Object.values(listaAsignaturasLocal)
-                .filter(a => a.nivel === "1")
-                .map(a => a.nombre);
-
-            const faltantesNivel1 = asignaturasNivel1Sistema.filter(a => !asignaturasInscritas.includes(a));
-
-            let html = `<h3>Horario de ${estudiante.nombre}</h3>`;
-
-            if (horarios.length === 0) {
-                html += `<p>El estudiante no tiene asignaturas inscritas.</p>`;
-            } else {
-                html += `<table>
-                    <thead>
-                        <tr>
-                            <th>Asignatura</th>
-                            <th>Tipo de Clase</th>
-                            <th>Día</th>
-                            <th>Bloque Horario</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                horarios.forEach(h => {
-                    html += `<tr>
-                        <td><strong>${h.asignatura}</strong></td>
-                        <td>${h.tipoClase}</td>
-                        <td>${h.dia}</td>
-                        <td>${h.bloque} hrs</td>
-                    </tr>`;
-                });
-                html += `</tbody></table>`;
-            }
-
-            html += `<h3 style="margin-top: 20px;">Cumplimiento de Nivel 1</h3>`;
-            if (asignaturasNivel1Sistema.length === 0) {
-                html += `<p class="warning">No hay asignaturas de Nivel 1 registradas en el sistema.</p>`;
-            } else if (faltantesNivel1.length === 0) {
-                html += `<p class="success">✓ El estudiante cumple con todas las asignaturas del Nivel 1.</p>`;
-            } else {
-                html += `<p class="warning">Asignaturas pendientes de Nivel 1:</p><ul>`;
-                faltantesNivel1.forEach(f => {
-                    html += `<li class="error">${f}</li>`;
-                });
-                html += `</ul>`;
-            }
-
-            divReporte.innerHTML = html;
-        }
-    </script>
-</body>
-</html>
+                const modalidad = document.getElementById('modalidad-lab').value;
+                if (modalidad === 'Sabado') {
+                    clases.push({
+                        tipo:
