@@ -155,9 +155,9 @@
     <h1>Plataforma de Planificación Docente</h1>
 
     <div class="tabs">
-        <button class="tab-button active" onclick="openTab('tab-registro')">1. Registro & Asignaturas</button>
-        <button class="tab-button" onclick="openTab('tab-inscripcion')">2. Inscribir Estudiante</button>
-        <button class="tab-button" onclick="openTab('tab-avance')">3. Estado & Avance de Estudiantes</button>
+        <button class="tab-button active" data-tab="tab-registro">1. Registro & Asignaturas</button>
+        <button class="tab-button" data-tab="tab-inscripcion">2. Inscribir Estudiante</button>
+        <button class="tab-button" data-tab="tab-avance">3. Estado & Avance de Estudiantes</button>
     </div>
 
     <div id="tab-registro" class="tab-content active">
@@ -322,14 +322,18 @@
         let listaEstudiantesLocal = {};
         let listaAsignaturasLocal = {};
 
-        // Control de Pestañas
-        window.openTab = function(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(tb => tb.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        };
+        // SISTEMA DE PESTAÑAS (EventListeners directos en JS)
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const targetTab = e.currentTarget.getAttribute('data-tab');
+
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(tb => tb.classList.remove('active'));
+
+                document.getElementById(targetTab).classList.add('active');
+                e.currentTarget.classList.add('active');
+            });
+        });
 
         // Alternar visibilidad de Ejercicios y Laboratorio
         document.getElementById('check-ejercicios').addEventListener('change', function() {
@@ -430,4 +434,294 @@
                 const modalidad = document.getElementById('modalidad-lab').value;
                 if (modalidad === 'Sabado') {
                     clases.push({
-                        tipo:
+                        tipo: "Laboratorio",
+                        dia: "Sabado",
+                        bloque: document.getElementById('bloque-lab-sabado').value
+                    });
+                } else {
+                    clases.push({
+                        tipo: "Laboratorio",
+                        dia: document.getElementById('dia-lab-semana').value,
+                        bloque: "21:00-22:00"
+                    });
+                }
+            }
+
+            try {
+                const docRef = doc(db, "asignaturas", nombre);
+                await setDoc(docRef, {
+                    nombre: nombre,
+                    nivel: nivel,
+                    clases: clases
+                });
+                msg.innerHTML = `<span class="success">Asignatura "${nombre}" guardada correctamente.</span>`;
+                document.getElementById('nombre-asignatura').value = '';
+            } catch (err) {
+                msg.innerHTML = `<span class="error">Error al guardar la asignatura.</span>`;
+                console.error(err);
+            }
+        });
+
+        // Funciones auxiliares para traslape de horario
+        function parseMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function hayTopeHorario(dia1, bloqueStr1, dia2, bloqueStr2) {
+            if (dia1 !== dia2) return false;
+            const [inicio1, fin1] = bloqueStr1.split('-').map(parseMinutes);
+            const [inicio2, fin2] = bloqueStr2.split('-').map(parseMinutes);
+            return Math.max(inicio1, inicio2) < Math.min(fin1, fin2);
+        }
+
+        // 3. INSCRIBIR ASIGNATURA
+        document.getElementById('form-inscripcion').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const estudianteId = document.getElementById('select-estudiante').value;
+            const asignaturaId = document.getElementById('select-asignatura').value;
+            const msg = document.getElementById('msg-inscripcion');
+
+            if (!estudianteId || !listaEstudiantesLocal[estudianteId] || !asignaturaId || !listaAsignaturasLocal[asignaturaId]) {
+                msg.innerHTML = `<span class="error">Selección no válida.</span>`;
+                return;
+            }
+
+            const estudianteData = listaEstudiantesLocal[estudianteId];
+            const asignaturaData = listaAsignaturasLocal[asignaturaId];
+            const horariosInscritos = estudianteData.horarios || [];
+
+            if (horariosInscritos.some(h => h.asignatura === asignaturaId)) {
+                msg.innerHTML = `<span class="error">El estudiante ya tiene inscrita la asignatura "${asignaturaId}".</span>`;
+                return;
+            }
+
+            let conflicto = null;
+            for (let claseNueva of asignaturaData.clases) {
+                for (let inscrita of horariosInscritos) {
+                    if (hayTopeHorario(claseNueva.dia, claseNueva.bloque, inscrita.dia, inscrita.bloque)) {
+                        conflicto = { nueva: claseNueva, existente: inscrita };
+                        break;
+                    }
+                }
+                if (conflicto) break;
+            }
+
+            if (conflicto) {
+                const cn = conflicto.nueva;
+                const ex = conflicto.existente;
+                msg.innerHTML = `<span class="error">¡TOPE DE HORARIO DETECTADO!<br>` +
+                    `La clase de ${cn.tipo} de ${asignaturaId} (${cn.dia} ${cn.bloque} hrs) choca con la clase de ` +
+                    `${ex.tipoClase} de ${ex.asignatura} (${ex.dia} ${ex.bloque} hrs).</span>`;
+                return;
+            }
+
+            const nuevosBloques = asignaturaData.clases.map(c => ({
+                asignatura: asignaturaData.nombre,
+                nivel: asignaturaData.nivel,
+                tipoClase: c.tipo,
+                dia: c.dia,
+                bloque: c.bloque
+            }));
+
+            try {
+                const docRef = doc(db, "estudiantes", estudianteId);
+                await updateDoc(docRef, {
+                    horarios: [...horariosInscritos, ...nuevosBloques]
+                });
+                msg.innerHTML = `<span class="success">¡Asignatura "${asignaturaId}" inscrita exitosamente!</span>`;
+            } catch (err) {
+                msg.innerHTML = `<span class="error">Error al inscribir la asignatura.</span>`;
+                console.error(err);
+            }
+        });
+
+        // FUNCIONALIDAD: ELIMINAR ASIGNATURA DE UN ESTUDIANTE
+        window.eliminarAsignaturaEstudiante = async function(estudianteId, nombreAsignatura) {
+            if (!confirm(`¿Está seguro de eliminar la asignatura "${nombreAsignatura}" de ${estudianteId}?`)) return;
+
+            const estudianteData = listaEstudiantesLocal[estudianteId];
+            if (!estudianteData) return;
+
+            const nuevosHorarios = (estudianteData.horarios || []).filter(h => h.asignatura !== nombreAsignatura);
+
+            try {
+                const docRef = doc(db, "estudiantes", estudianteId);
+                await updateDoc(docRef, { horarios: nuevosHorarios });
+            } catch (err) {
+                alert("Error al eliminar la asignatura: " + err.message);
+            }
+        };
+
+        // FUNCIONALIDAD: MODIFICAR / CAMBIAR ASIGNATURA
+        window.modificarAsignaturaEstudiante = async function(estudianteId, nombreAsignaturaAnterior) {
+            const nuevaAsignatura = prompt(`Ingrese el nombre de la nueva asignatura para reemplazar "${nombreAsignaturaAnterior}":\nOpciones disponibles: ${Object.keys(listaAsignaturasLocal).join(', ')}`);
+            
+            if (!nuevaAsignatura || !listaAsignaturasLocal[nuevaAsignatura]) {
+                if (nuevaAsignatura) alert("La asignatura ingresada no existe en el sistema.");
+                return;
+            }
+
+            const estudianteData = listaEstudiantesLocal[estudianteId];
+            const horariosLimpios = (estudianteData.horarios || []).filter(h => h.asignatura !== nombreAsignaturaAnterior);
+            
+            const asignaturaNuevaData = listaAsignaturasLocal[nuevaAsignatura];
+
+            let conflicto = null;
+            for (let claseNueva of asignaturaNuevaData.clases) {
+                for (let inscrita of horariosLimpios) {
+                    if (hayTopeHorario(claseNueva.dia, claseNueva.bloque, inscrita.dia, inscrita.bloque)) {
+                        conflicto = { nueva: claseNueva, existente: inscrita };
+                        break;
+                    }
+                }
+                if (conflicto) break;
+            }
+
+            if (conflicto) {
+                alert(`No se puede reemplazar por "${nuevaAsignatura}". Genera tope de horario con ${conflicto.existente.asignatura} (${conflicto.existente.dia} ${conflicto.existente.bloque}).`);
+                return;
+            }
+
+            const nuevosBloques = asignaturaNuevaData.clases.map(c => ({
+                asignatura: asignaturaNuevaData.nombre,
+                nivel: asignaturaNuevaData.nivel,
+                tipoClase: c.tipo,
+                dia: c.dia,
+                bloque: c.bloque
+            }));
+
+            try {
+                const docRef = doc(db, "estudiantes", estudianteId);
+                await updateDoc(docRef, {
+                    horarios: [...horariosLimpios, ...nuevosBloques]
+                });
+                alert(`¡Se reemplazó "${nombreAsignaturaAnterior}" por "${nuevaAsignatura}" exitosamente!`);
+            } catch (err) {
+                alert("Error al modificar asignatura.");
+            }
+        };
+
+        function actualizarSelects() {
+            const selectEst = document.getElementById('select-estudiante');
+            const selectAsig = document.getElementById('select-asignatura');
+            const selectAna = document.getElementById('analisis-estudiante');
+
+            const valEst = selectEst.value;
+            const valAsig = selectAsig.value;
+            const valAna = selectAna.value;
+
+            selectEst.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+            selectAna.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+            for (let id in listaEstudiantesLocal) {
+                selectEst.innerHTML += `<option value="${id}">${id}</option>`;
+                selectAna.innerHTML += `<option value="${id}">${id}</option>`;
+            }
+
+            selectAsig.innerHTML = '<option value="">-- Seleccione una asignatura --</option>';
+            for (let id in listaAsignaturasLocal) {
+                const asig = listaAsignaturasLocal[id];
+                selectAsig.innerHTML += `<option value="${id}">${asig.nombre} (Nivel ${asig.nivel})</option>`;
+            }
+
+            selectEst.value = valEst;
+            selectAsig.value = valAsig;
+            selectAna.value = valAna;
+        }
+
+        document.getElementById('analisis-estudiante').addEventListener('change', refrescarVista);
+
+        function refrescarVista() {
+            const estudianteId = document.getElementById('analisis-estudiante').value;
+            const divReporte = document.getElementById('reporte-estudiante');
+
+            if (!estudianteId || !listaEstudiantesLocal[estudianteId]) {
+                divReporte.innerHTML = '';
+                return;
+            }
+
+            const estudiante = listaEstudiantesLocal[estudianteId];
+            const horarios = estudiante.horarios || [];
+
+            const asignaturasInscritas = [...new Set(horarios.map(h => h.asignatura))];
+            
+            const totalAsignaturasSistema = Object.keys(listaAsignaturasLocal).length;
+            const asignaturasNivel1Sistema = Object.values(listaAsignaturasLocal)
+                .filter(a => a.nivel === "1")
+                .map(a => a.nombre);
+
+            const faltantesNivel1 = asignaturasNivel1Sistema.filter(a => !asignaturasInscritas.includes(a));
+
+            const numInscritas = asignaturasInscritas.length;
+            const porcentajeAvance = totalAsignaturasSistema > 0 
+                ? Math.round((numInscritas / totalAsignaturasSistema) * 100) 
+                : 0;
+
+            let html = `
+                <div class="progress-box">
+                    <strong>Avance Curricular del Estudiante:</strong> ${numInscritas} de ${totalAsignaturasSistema} Asignaturas Registradas (${porcentajeAvance}%)
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${porcentajeAvance}%">${porcentajeAvance}%</div>
+                    </div>
+                </div>
+
+                <h3>Horario e Inscripciones de ${estudiante.nombre}</h3>
+            `;
+
+            if (horarios.length === 0) {
+                html += `<p>El estudiante no tiene asignaturas inscritas actualmente.</p>`;
+            } else {
+                html += `<table>
+                    <thead>
+                        <tr>
+                            <th>Asignatura</th>
+                            <th>Tipo de Clase</th>
+                            <th>Día</th>
+                            <th>Bloque Horario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                let ultimaAsignatura = "";
+                horarios.forEach(h => {
+                    const esPrimeraFila = h.asignatura !== ultimaAsignatura;
+                    ultimaAsignatura = h.asignatura;
+
+                    html += `<tr>
+                        <td><strong>${h.asignatura}</strong></td>
+                        <td>${h.tipoClase}</td>
+                        <td>${h.dia}</td>
+                        <td>${h.bloque} hrs</td>
+                        <td>`;
+                    
+                    if (esPrimeraFila) {
+                        html += `
+                            <button class="btn-warning" onclick="modificarAsignaturaEstudiante('${estudiante.nombre}', '${h.asignatura}')">Modificar</button>
+                            <button class="btn-danger" onclick="eliminarAsignaturaEstudiante('${estudiante.nombre}', '${h.asignatura}')">Eliminar</button>
+                        `;
+                    }
+                    
+                    html += `</td></tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+
+            html += `<h3 style="margin-top: 25px;">Cumplimiento de Nivel 1</h3>`;
+            if (asignaturasNivel1Sistema.length === 0) {
+                html += `<p class="warning">No hay asignaturas de Nivel 1 registradas en el sistema.</p>`;
+            } else if (faltantesNivel1.length === 0) {
+                html += `<p class="success">✓ El estudiante cumple con todas las asignaturas requeridas para el Nivel 1.</p>`;
+            } else {
+                html += `<p class="warning">Asignaturas pendientes de Nivel 1 para completar la malla:</p><ul>`;
+                faltantesNivel1.forEach(f => {
+                    html += `<li class="error">${f}</li>`;
+                });
+                html += `</ul>`;
+            }
+
+            divReporte.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
