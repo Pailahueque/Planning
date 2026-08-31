@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificación Docente Completa - Firebase</title>
+    <title>Planificación Docente - Horarios Nocturnos y Sabatinos</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -94,7 +94,7 @@
                 </select>
 
                 <div class="sub-group">
-                    <h4>Clase Teórica</h4>
+                    <h4>Clase Teórica (Lunes a Viernes)</h4>
                     <div style="display:flex; gap: 5px;">
                         <select id="dia-teoria" required>
                             <option value="Lunes">Lunes</option>
@@ -104,16 +104,15 @@
                             <option value="Viernes">Viernes</option>
                         </select>
                         <select id="bloque-teoria" required>
-                            <option value="08:00-09:30">08:00-09:30</option>
-                            <option value="09:40-11:10">09:40-11:10</option>
-                            <option value="11:20-12:50">11:20-12:50</option>
-                            <option value="14:00-15:30">14:00-15:30</option>
+                            <option value="19:00-20:00">19:00 - 20:00 hrs</option>
+                            <option value="20:00-21:00">20:00 - 21:00 hrs</option>
+                            <option value="21:00-22:00">21:00 - 22:00 hrs</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="sub-group">
-                    <h4>Clase de Ejercicios</h4>
+                    <h4>Clase de Ejercicios (Lunes a Viernes)</h4>
                     <div style="display:flex; gap: 5px;">
                         <select id="dia-ejercicios" required>
                             <option value="Lunes">Lunes</option>
@@ -123,29 +122,24 @@
                             <option value="Viernes">Viernes</option>
                         </select>
                         <select id="bloque-ejercicios" required>
-                            <option value="08:00-09:30">08:00-09:30</option>
-                            <option value="09:40-11:10" selected>09:40-11:10</option>
-                            <option value="11:20-12:50">11:20-12:50</option>
-                            <option value="14:00-15:30">14:00-15:30</option>
+                            <option value="19:00-20:00">19:00 - 20:00 hrs</option>
+                            <option value="20:00-21:00" selected>20:00 - 21:00 hrs</option>
+                            <option value="21:00-22:00">21:00 - 22:00 hrs</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="sub-group">
-                    <h4>Clase de Laboratorio</h4>
+                    <h4>Clase de Laboratorio (Sábados)</h4>
                     <div style="display:flex; gap: 5px;">
                         <select id="dia-lab" required>
-                            <option value="Lunes">Lunes</option>
-                            <option value="Martes">Martes</option>
-                            <option value="Miercoles">Miércoles</option>
-                            <option value="Jueves">Jueves</option>
-                            <option value="Viernes" selected>Viernes</option>
+                            <option value="Sabado" selected>Sábado</option>
                         </select>
                         <select id="bloque-lab" required>
-                            <option value="08:00-09:30">08:00-09:30</option>
-                            <option value="09:40-11:10">09:40-11:10</option>
-                            <option value="11:20-12:50" selected>11:20-12:50</option>
-                            <option value="14:00-15:30">14:00-15:30</option>
+                            <option value="08:00-09:45">08:00 - 09:45 hrs</option>
+                            <option value="09:45-11:30">09:45 - 11:30 hrs</option>
+                            <option value="11:30-13:15">11:30 - 13:15 hrs</option>
+                            <option value="12:45-14:30">12:45 - 14:30 hrs</option>
                         </select>
                     </div>
                 </div>
@@ -192,7 +186,7 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Configuración de tu proyecto Firebase
+        // Configuración del proyecto Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDNJ4Z-XXkEm6AN6FLSfnRnQhOg6eW7suY",
             authDomain: "prog-docente.firebaseapp.com",
@@ -258,7 +252,7 @@
             }
         });
 
-        // 2. CREAR Y GUARDAR ASIGNATURA
+        // 2. CREAR Y GUARDAR ASIGNATURA CON LOS NUEVOS HORARIOS
         document.getElementById('form-asignatura').addEventListener('submit', async function(e) {
             e.preventDefault();
             const nombre = document.getElementById('nombre-asignatura').value.trim();
@@ -315,7 +309,7 @@
                 return;
             }
 
-            // Validar topes de horario para cada una de las 3 clases (Teoría, Ejercicios, Lab)
+            // Validar topes de horario para Teórica, Ejercicios y Laboratorio
             let conflictoEncontrado = null;
 
             for (let claseNue of asignaturaData.clases) {
@@ -338,7 +332,7 @@
                 return;
             }
 
-            // Si no hay topes, agregar los 3 bloques al estudiante
+            // Si no hay tope, agregar los bloques al alumno
             const nuevosBloques = asignaturaData.clases.map(c => ({
                 asignatura: asignaturaData.nombre,
                 nivel: asignaturaData.nivel,
@@ -404,10 +398,8 @@
             const estudiante = listaEstudiantesLocal[estudianteId];
             const horarios = estudiante.horarios || [];
 
-            // Obtener asignaturas únicas inscritas
             const asignaturasInscritas = [...new Set(horarios.map(h => h.asignatura))];
 
-            // Evaluar avance por Nivel 1 (puedes cambiar o ampliar niveles)
             const asignaturasNivel1Sistema = Object.values(listaAsignaturasLocal)
                 .filter(a => a.nivel === "1")
                 .map(a => a.nombre);
@@ -434,7 +426,7 @@
                         <td><strong>${h.asignatura}</strong></td>
                         <td>${h.tipoClase}</td>
                         <td>${h.dia}</td>
-                        <td>${h.bloque}</td>
+                        <td>${h.bloque} hrs</td>
                     </tr>`;
                 });
                 html += `</tbody></table>`;
