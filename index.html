@@ -50,7 +50,6 @@
     <h1>Plataforma de Planificación Docente (Conectado a Firebase)</h1>
 
     <div class="grid-container">
-        <!-- Sección 1: Ingreso de Estudiantes -->
         <div class="card">
             <h2>1. Registrar Estudiante</h2>
             <form id="form-estudiante">
@@ -61,7 +60,6 @@
             <p id="msg-estudiante"></p>
         </div>
 
-        <!-- Sección 2: Asignación de Horarios -->
         <div class="card">
             <h2>2. Asignar Asignatura y Horario</h2>
             <form id="form-horario">
@@ -105,7 +103,6 @@
             <p id="msg-horario"></p>
         </div>
 
-        <!-- Sección 3: Análisis y Reporte del Estudiante -->
         <div class="card" style="grid-column: span 2;">
             <h2>3. Estado del Estudiante (Análisis de Nivel)</h2>
             <label for="analisis-estudiante">Ver estado de:</label>
@@ -116,14 +113,11 @@
         </div>
     </div>
 
-    <!-- Script tipo MODULO requerido para la nueva sintaxis de Firebase -->
     <script type="module">
-        // Importar funciones de Firebase desde los servidores de Google (CDNs)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Tu configuración exacta de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDNJ4Z-XXkEm6AN6FLSfnRnQhOg6eW7suY",
             authDomain: "prog-docente.firebaseapp.com",
@@ -134,7 +128,6 @@
             measurementId: "G-2WJ8E16HGF"
         };
 
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
@@ -150,7 +143,6 @@
             });
             actualizarSelects();
             
-            // Refrescar datos si hay alguien seleccionado
             const seleccionado = document.getElementById('analisis-estudiante').value;
             if (seleccionado) {
                 generarReporte(seleccionado);
@@ -172,7 +164,6 @@
                 if (docSnap.exists()) {
                     msg.innerHTML = `<span class="error">El estudiante ya está registrado.</span>`;
                 } else {
-                    // Crear nuevo documento
                     await setDoc(docRef, {
                         nombre: nombre,
                         horarios: []
@@ -181,7 +172,7 @@
                     document.getElementById('nombre-estudiante').value = '';
                 }
             } catch (err) {
-                msg.innerHTML = `<span class="error">Error al guardar: Asegúrate de habilitar Firestore (Paso 3)</span>`;
+                msg.innerHTML = `<span class="error">Error al guardar: Revisa las Reglas en Firebase Console.</span>`;
                 console.error(err);
             }
         });
