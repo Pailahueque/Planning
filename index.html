@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planificación Docente - Firebase</title>
+    <title>Planificación Docente Completa - Firebase</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,24 +12,29 @@
             margin: 0;
             padding: 20px;
         }
-        h1, h2 { color: #2c3e50; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+        h2 { color: #2c3e50; margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
         .grid-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         .card {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
         }
+        .full-width { grid-column: 1 / -1; }
         form { display: flex; flex-direction: column; gap: 10px; }
-        label { font-weight: bold; }
+        label { font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
         input, select, button {
-            padding: 8px;
+            padding: 9px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 0.95rem;
         }
         button {
             background-color: #3498db;
@@ -37,80 +42,149 @@
             font-weight: bold;
             cursor: pointer;
             border: none;
+            margin-top: 10px;
+            transition: background-color 0.2s;
         }
         button:hover { background-color: #2980b9; }
+        .sub-group {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 5px;
+        }
+        .sub-group h4 { margin: 0 0 8px 0; color: #34495e; font-size: 0.95rem; }
         .error { color: #e74c3c; font-weight: bold; margin-top: 10px; }
         .success { color: #27ae60; font-weight: bold; margin-top: 10px; }
         .warning { color: #f39c12; font-weight: bold; margin-top: 10px; }
         ul { padding-left: 20px; }
+        li { margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9rem; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
 
-    <h1>Plataforma de Planificación Docente (Conectado a Firebase)</h1>
+    <h1>Plataforma de Planificación Docente</h1>
 
     <div class="grid-container">
+        
         <div class="card">
             <h2>1. Registrar Estudiante</h2>
             <form id="form-estudiante">
                 <label for="nombre-estudiante">Nombre del Estudiante:</label>
                 <input type="text" id="nombre-estudiante" required placeholder="Ej. Juan Pérez">
-                <button type="submit">Agregar Estudiante</button>
+                <button type="submit">Guardar Estudiante</button>
             </form>
             <p id="msg-estudiante"></p>
         </div>
 
         <div class="card">
-            <h2>2. Asignar Asignatura y Horario</h2>
-            <form id="form-horario">
+            <h2>2. Crear Nueva Asignatura</h2>
+            <form id="form-asignatura">
+                <label for="nombre-asignatura">Nombre Asignatura:</label>
+                <input type="text" id="nombre-asignatura" required placeholder="Ej. Matemáticas I">
+
+                <label for="nivel-asignatura">Nivel al que pertenece:</label>
+                <select id="nivel-asignatura" required>
+                    <option value="1">Nivel 1</option>
+                    <option value="2">Nivel 2</option>
+                    <option value="3">Nivel 3</option>
+                </select>
+
+                <div class="sub-group">
+                    <h4>Clase Teórica</h4>
+                    <div style="display:flex; gap: 5px;">
+                        <select id="dia-teoria" required>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miercoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                        </select>
+                        <select id="bloque-teoria" required>
+                            <option value="08:00-09:30">08:00-09:30</option>
+                            <option value="09:40-11:10">09:40-11:10</option>
+                            <option value="11:20-12:50">11:20-12:50</option>
+                            <option value="14:00-15:30">14:00-15:30</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sub-group">
+                    <h4>Clase de Ejercicios</h4>
+                    <div style="display:flex; gap: 5px;">
+                        <select id="dia-ejercicios" required>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miercoles" selected>Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                        </select>
+                        <select id="bloque-ejercicios" required>
+                            <option value="08:00-09:30">08:00-09:30</option>
+                            <option value="09:40-11:10" selected>09:40-11:10</option>
+                            <option value="11:20-12:50">11:20-12:50</option>
+                            <option value="14:00-15:30">14:00-15:30</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sub-group">
+                    <h4>Clase de Laboratorio</h4>
+                    <div style="display:flex; gap: 5px;">
+                        <select id="dia-lab" required>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miercoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes" selected>Viernes</option>
+                        </select>
+                        <select id="bloque-lab" required>
+                            <option value="08:00-09:30">08:00-09:30</option>
+                            <option value="09:40-11:10">09:40-11:10</option>
+                            <option value="11:20-12:50" selected>11:20-12:50</option>
+                            <option value="14:00-15:30">14:00-15:30</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit">Guardar Asignatura</button>
+            </form>
+            <p id="msg-asignatura"></p>
+        </div>
+
+        <div class="card">
+            <h2>3. Inscribir Estudiante en Asignatura</h2>
+            <form id="form-inscripcion">
                 <label for="select-estudiante">Seleccionar Estudiante:</label>
                 <select id="select-estudiante" required>
-                    <option value="">-- Cargando estudiantes... --</option>
+                    <option value="">-- Cargando... --</option>
                 </select>
 
-                <label for="asignatura">Asignatura:</label>
-                <select id="asignatura" required>
-                    <option value="Matematicas">Matemáticas (Nivel 1)</option>
-                    <option value="Fisica">Física (Nivel 1)</option>
-                    <option value="Programacion">Programación (Nivel 1)</option>
+                <label for="select-asignatura">Seleccionar Asignatura a Inscribir:</label>
+                <select id="select-asignatura" required>
+                    <option value="">-- Cargando... --</option>
                 </select>
 
-                <label for="tipo-clase">Tipo de Clase:</label>
-                <select id="tipo-clase" required>
-                    <option value="Teorica">Teórica</option>
-                    <option value="Ejercicios">Ejercicios</option>
-                    <option value="Laboratorio">Laboratorio</option>
-                </select>
-
-                <label for="dia">Día:</label>
-                <select id="dia" required>
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miercoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                </select>
-
-                <label for="bloque">Bloque Horario:</label>
-                <select id="bloque" required>
-                    <option value="08:00-09:30">08:00 - 09:30</option>
-                    <option value="09:40-11:10">09:40 - 11:10</option>
-                    <option value="11:20-12:50">11:20 - 12:50</option>
-                </select>
-
-                <button type="submit">Asignar Horario</button>
+                <button type="submit">Inscribir Asignatura Completa</button>
             </form>
-            <p id="msg-horario"></p>
+            <p id="msg-inscripcion"></p>
         </div>
 
-        <div class="card" style="grid-column: span 2;">
-            <h2>3. Estado del Estudiante (Análisis de Nivel)</h2>
-            <label for="analisis-estudiante">Ver estado de:</label>
-            <select id="analisis-estudiante">
-                <option value="">-- Seleccione un estudiante --</option>
-            </select>
-            <div id="reporte-estudiante" style="margin-top: 15px;"></div>
+        <div class="card full-width">
+            <h2>4. Estado del Estudiante y Horario Inscrito</h2>
+            <div style="max-width: 400px; margin-bottom: 15px;">
+                <label for="analisis-estudiante">Seleccionar Estudiante para consultar:</label>
+                <select id="analisis-estudiante">
+                    <option value="">-- Seleccione un estudiante --</option>
+                </select>
+            </div>
+            
+            <div id="reporte-estudiante"></div>
         </div>
+
     </div>
 
     <script type="module">
@@ -118,6 +192,7 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Configuración de tu proyecto Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDNJ4Z-XXkEm6AN6FLSfnRnQhOg6eW7suY",
             authDomain: "prog-docente.firebaseapp.com",
@@ -133,23 +208,29 @@
         const db = getFirestore(app);
 
         let listaEstudiantesLocal = {};
-        const mallaNivel1 = ["Matematicas", "Fisica", "Programacion"];
+        let listaAsignaturasLocal = {};
 
-        // Escuchar cambios en tiempo real desde Firestore
+        // Escuchar cambios en tiempo real: Estudiantes
         onSnapshot(collection(db, "estudiantes"), (snapshot) => {
             listaEstudiantesLocal = {};
             snapshot.forEach((doc) => {
                 listaEstudiantesLocal[doc.id] = doc.data();
             });
             actualizarSelects();
-            
-            const seleccionado = document.getElementById('analisis-estudiante').value;
-            if (seleccionado) {
-                generarReporte(seleccionado);
-            }
+            refrescarVista();
         });
 
-        // 1. Registrar Estudiante en Firestore
+        // Escuchar cambios en tiempo real: Asignaturas
+        onSnapshot(collection(db, "asignaturas"), (snapshot) => {
+            listaAsignaturasLocal = {};
+            snapshot.forEach((doc) => {
+                listaAsignaturasLocal[doc.id] = doc.data();
+            });
+            actualizarSelects();
+            refrescarVista();
+        });
+
+        // 1. REGISTRAR ESTUDIANTE
         document.getElementById('form-estudiante').addEventListener('submit', async function(e) {
             e.preventDefault();
             const nombre = document.getElementById('nombre-estudiante').value.trim();
@@ -162,114 +243,211 @@
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists()) {
-                    msg.innerHTML = `<span class="error">El estudiante ya está registrado.</span>`;
+                    msg.innerHTML = `<span class="error">El estudiante ya existe.</span>`;
                 } else {
                     await setDoc(docRef, {
                         nombre: nombre,
                         horarios: []
                     });
-                    msg.innerHTML = `<span class="success">Estudiante ${nombre} guardado en la base de datos.</span>`;
+                    msg.innerHTML = `<span class="success">Estudiante ${nombre} registrado exitosamente.</span>`;
                     document.getElementById('nombre-estudiante').value = '';
                 }
             } catch (err) {
-                msg.innerHTML = `<span class="error">Error al guardar: Revisa las Reglas en Firebase Console.</span>`;
+                msg.innerHTML = `<span class="error">Error al guardar: Verifica las Reglas en Firebase Console.</span>`;
                 console.error(err);
             }
         });
 
-        // Actualizar dropdowns
-        function actualizarSelects() {
-            const selectAsignacion = document.getElementById('select-estudiante');
-            const selectAnalisis = document.getElementById('analisis-estudiante');
-            
-            const valorSelAsig = selectAsignacion.value;
-            const valorSelAna = selectAnalisis.value;
-
-            selectAsignacion.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-            selectAnalisis.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-
-            for (let id in listaEstudiantesLocal) {
-                selectAsignacion.innerHTML += `<option value="${id}">${id}</option>`;
-                selectAnalisis.innerHTML += `<option value="${id}">${id}</option>`;
-            }
-
-            selectAsignacion.value = valorSelAsig;
-            selectAnalisis.value = valorSelAna;
-        }
-
-        // 2. Asignar Horario con validación de TOPES
-        document.getElementById('form-horario').addEventListener('submit', async function(e) {
+        // 2. CREAR Y GUARDAR ASIGNATURA
+        document.getElementById('form-asignatura').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const estudiante = document.getElementById('select-estudiante').value;
-            const asignatura = document.getElementById('asignatura').value;
-            const tipoClase = document.getElementById('tipo-clase').value;
-            const dia = document.getElementById('dia').value;
-            const bloque = document.getElementById('bloque').value;
-            const msg = document.getElementById('msg-horario');
+            const nombre = document.getElementById('nombre-asignatura').value.trim();
+            const nivel = document.getElementById('nivel-asignatura').value;
+            const msg = document.getElementById('msg-asignatura');
 
-            if (!estudiante) {
-                msg.innerHTML = `<span class="error">Por favor seleccione un estudiante.</span>`;
+            const clases = [
+                { tipo: "Teórica", dia: document.getElementById('dia-teoria').value, bloque: document.getElementById('bloque-teoria').value },
+                { tipo: "Ejercicios", dia: document.getElementById('dia-ejercicios').value, bloque: document.getElementById('bloque-ejercicios').value },
+                { tipo: "Laboratorio", dia: document.getElementById('dia-lab').value, bloque: document.getElementById('bloque-lab').value }
+            ];
+
+            try {
+                const docRef = doc(db, "asignaturas", nombre);
+                await setDoc(docRef, {
+                    nombre: nombre,
+                    nivel: nivel,
+                    clases: clases
+                });
+                msg.innerHTML = `<span class="success">Asignatura "${nombre}" guardada con sus 3 horarios.</span>`;
+                document.getElementById('nombre-asignatura').value = '';
+            } catch (err) {
+                msg.innerHTML = `<span class="error">Error al guardar asignatura.</span>`;
+                console.error(err);
+            }
+        });
+
+        // 3. INSCRIBIR ASIGNATURA CON DETECCIÓN DE TOPES
+        document.getElementById('form-inscripcion').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const estudianteId = document.getElementById('select-estudiante').value;
+            const asignaturaId = document.getElementById('select-asignatura').value;
+            const msg = document.getElementById('msg-inscripcion');
+
+            if (!estudianteId || !listaEstudiantesLocal[estudianteId]) {
+                msg.innerHTML = `<span class="error">Por favor seleccione un estudiante válido.</span>`;
                 return;
             }
 
-            const horariosActuales = listaEstudiantesLocal[estudiante].horarios || [];
-            
-            // Validar tope de horario
-            const tope = horariosActuales.find(h => h.dia === dia && h.bloque === bloque);
+            if (!asignaturaId || !listaAsignaturasLocal[asignaturaId]) {
+                msg.innerHTML = `<span class="error">Por favor seleccione una asignatura válida.</span>`;
+                return;
+            }
 
-            if (tope) {
-                msg.innerHTML = `<span class="error">¡Tope de horario! El estudiante ya tiene "${tope.asignatura} (${tope.tipoClase})" el ${dia} a las ${bloque}.</span>`;
-            } else {
-                const nuevoHorario = { asignatura, tipoClase, dia, bloque };
-                horariosActuales.push(nuevoHorario);
+            const estudianteData = listaEstudiantesLocal[estudianteId];
+            const asignaturaData = listaAsignaturasLocal[asignaturaId];
 
-                try {
-                    const docRef = doc(db, "estudiantes", estudiante);
-                    await updateDoc(docRef, {
-                        horarios: horariosActuales
-                    });
-                    msg.innerHTML = `<span class="success">Clase asignada exitosamente.</span>`;
-                } catch (err) {
-                    msg.innerHTML = `<span class="error">Error al actualizar horario.</span>`;
-                    console.error(err);
+            const horariosInscritos = estudianteData.horarios || [];
+
+            // Verificar si el alumno ya tiene inscrita esta asignatura
+            const yaInscrita = horariosInscritos.some(h => h.asignatura === asignaturaId);
+            if (yaInscrita) {
+                msg.innerHTML = `<span class="error">El estudiante ya tiene inscrita la asignatura "${asignaturaId}".</span>`;
+                return;
+            }
+
+            // Validar topes de horario para cada una de las 3 clases (Teoría, Ejercicios, Lab)
+            let conflictoEncontrado = null;
+
+            for (let claseNue of asignaturaData.clases) {
+                const tope = horariosInscritos.find(h => h.dia === claseNue.dia && h.bloque === claseNue.bloque);
+                if (tope) {
+                    conflictoEncontrado = {
+                        claseNue,
+                        topeExistente: tope
+                    };
+                    break;
                 }
+            }
+
+            if (conflictoEncontrado) {
+                const c = conflictoEncontrado.claseNue;
+                const t = conflictoEncontrado.topeExistente;
+                msg.innerHTML = `<span class="error">¡TOPE DE HORARIO DETECTADO!<br>` +
+                    `La clase de ${c.tipo} de ${asignaturaId} (${c.dia} ${c.bloque}) choca con la clase de ` +
+                    `${t.tipoClase} de ${t.asignatura} que ya tiene el estudiante.</span>`;
+                return;
+            }
+
+            // Si no hay topes, agregar los 3 bloques al estudiante
+            const nuevosBloques = asignaturaData.clases.map(c => ({
+                asignatura: asignaturaData.nombre,
+                nivel: asignaturaData.nivel,
+                tipoClase: c.tipo,
+                dia: c.dia,
+                bloque: c.bloque
+            }));
+
+            const horarioActualizado = [...horariosInscritos, ...nuevosBloques];
+
+            try {
+                const docRef = doc(db, "estudiantes", estudianteId);
+                await updateDoc(docRef, {
+                    horarios: horarioActualizado
+                });
+                msg.innerHTML = `<span class="success">¡Asignatura "${asignaturaId}" inscrita correctamente!</span>`;
+            } catch (err) {
+                msg.innerHTML = `<span class="error">Error al inscribir la asignatura.</span>`;
+                console.error(err);
             }
         });
 
-        // 3. Generar Reporte de Nivel
-        document.getElementById('analisis-estudiante').addEventListener('change', function(e) {
-            generarReporte(e.target.value);
-        });
+        // Actualizar listas desplegables (Dropdowns)
+        function actualizarSelects() {
+            const selectEst = document.getElementById('select-estudiante');
+            const selectAsig = document.getElementById('select-asignatura');
+            const selectAna = document.getElementById('analisis-estudiante');
 
-        function generarReporte(nombreEstudiante) {
+            const valEst = selectEst.value;
+            const valAsig = selectAsig.value;
+            const valAna = selectAna.value;
+
+            selectEst.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+            selectAna.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+            for (let id in listaEstudiantesLocal) {
+                selectEst.innerHTML += `<option value="${id}">${id}</option>`;
+                selectAna.innerHTML += `<option value="${id}">${id}</option>`;
+            }
+
+            selectAsig.innerHTML = '<option value="">-- Seleccione una asignatura --</option>';
+            for (let id in listaAsignaturasLocal) {
+                const asig = listaAsignaturasLocal[id];
+                selectAsig.innerHTML += `<option value="${id}">${asig.nombre} (Nivel ${asig.nivel})</option>`;
+            }
+
+            selectEst.value = valEst;
+            selectAsig.value = valAsig;
+            selectAna.value = valAna;
+        }
+
+        // Refrescar vista de reporte si hay alguien seleccionado
+        document.getElementById('analisis-estudiante').addEventListener('change', refrescarVista);
+
+        function refrescarVista() {
+            const estudianteId = document.getElementById('analisis-estudiante').value;
             const divReporte = document.getElementById('reporte-estudiante');
-            if (!nombreEstudiante || !listaEstudiantesLocal[nombreEstudiante]) {
+
+            if (!estudianteId || !listaEstudiantesLocal[estudianteId]) {
                 divReporte.innerHTML = '';
                 return;
             }
 
-            const datos = listaEstudiantesLocal[nombreEstudiante];
-            const horarios = datos.horarios || [];
-            
-            const asignaturasTomadas = [...new Set(horarios.map(h => h.asignatura))];
-            const asignaturasFaltantes = mallaNivel1.filter(a => !asignaturasTomadas.includes(a));
+            const estudiante = listaEstudiantesLocal[estudianteId];
+            const horarios = estudiante.horarios || [];
 
-            let html = `<h3>Horario actual de ${nombreEstudiante}</h3><ul>`;
+            // Obtener asignaturas únicas inscritas
+            const asignaturasInscritas = [...new Set(horarios.map(h => h.asignatura))];
+
+            // Evaluar avance por Nivel 1 (puedes cambiar o ampliar niveles)
+            const asignaturasNivel1Sistema = Object.values(listaAsignaturasLocal)
+                .filter(a => a.nivel === "1")
+                .map(a => a.nombre);
+
+            const faltantesNivel1 = asignaturasNivel1Sistema.filter(a => !asignaturasInscritas.includes(a));
+
+            let html = `<h3>Horario de ${estudiante.nombre}</h3>`;
+
             if (horarios.length === 0) {
-                html += `<li>No tiene asignaturas/horarios asignados.</li>`;
+                html += `<p>El estudiante no tiene asignaturas inscritas.</p>`;
             } else {
+                html += `<table>
+                    <thead>
+                        <tr>
+                            <th>Asignatura</th>
+                            <th>Tipo de Clase</th>
+                            <th>Día</th>
+                            <th>Bloque Horario</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
                 horarios.forEach(h => {
-                    html += `<li><strong>${h.asignatura}</strong> (${h.tipoClase}) - ${h.dia} | ${h.bloque}</li>`;
+                    html += `<tr>
+                        <td><strong>${h.asignatura}</strong></td>
+                        <td>${h.tipoClase}</td>
+                        <td>${h.dia}</td>
+                        <td>${h.bloque}</td>
+                    </tr>`;
                 });
+                html += `</tbody></table>`;
             }
-            html += `</ul>`;
 
-            html += `<h3>Cumplimiento Nivel 1</h3>`;
-            if (asignaturasFaltantes.length === 0) {
-                html += `<p class="success">✓ Cumple con todas las asignaturas del Nivel 1.</p>`;
+            html += `<h3 style="margin-top: 20px;">Cumplimiento de Nivel 1</h3>`;
+            if (asignaturasNivel1Sistema.length === 0) {
+                html += `<p class="warning">No se han creado asignaturas de Nivel 1 en el sistema todavía.</p>`;
+            } else if (faltantesNivel1.length === 0) {
+                html += `<p class="success">✓ El estudiante ha inscrito todas las asignaturas requeridas para el Nivel 1.</p>`;
             } else {
-                html += `<p class="warning">Le faltan las siguientes asignaturas para completar el Nivel 1:</p><ul>`;
-                asignaturasFaltantes.forEach(f => {
+                html += `<p class="warning">Asignaturas pendientes de Nivel 1 para completar la malla:</p><ul>`;
+                faltantesNivel1.forEach(f => {
                     html += `<li class="error">${f}</li>`;
                 });
                 html += `</ul>`;
