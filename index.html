@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planificación Docente - Firebase</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -54,6 +50,7 @@
     <h1>Plataforma de Planificación Docente (Conectado a Firebase)</h1>
 
     <div class="grid-container">
+        <!-- Sección 1: Ingreso de Estudiantes -->
         <div class="card">
             <h2>1. Registrar Estudiante</h2>
             <form id="form-estudiante">
@@ -64,6 +61,7 @@
             <p id="msg-estudiante"></p>
         </div>
 
+        <!-- Sección 2: Asignación de Horarios -->
         <div class="card">
             <h2>2. Asignar Asignatura y Horario</h2>
             <form id="form-horario">
@@ -107,6 +105,7 @@
             <p id="msg-horario"></p>
         </div>
 
+        <!-- Sección 3: Análisis y Reporte del Estudiante -->
         <div class="card" style="grid-column: span 2;">
             <h2>3. Estado del Estudiante (Análisis de Nivel)</h2>
             <label for="analisis-estudiante">Ver estado de:</label>
@@ -117,33 +116,41 @@
         </div>
     </div>
 
-    <script>
-        // CONFIGURACIÓN DE FIREBASE (Reemplaza con tus credenciales de la consola)
+    <!-- Script tipo MODULO requerido para la nueva sintaxis de Firebase -->
+    <script type="module">
+        // Importar funciones de Firebase desde los servidores de Google (CDNs)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Tu configuración exacta de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
+            apiKey: "AIzaSyDNJ4Z-XXkEm6AN6FLSfnRnQhOg6eW7suY",
+            authDomain: "prog-docente.firebaseapp.com",
+            projectId: "prog-docente",
+            storageBucket: "prog-docente.firebasestorage.app",
+            messagingSenderId: "886699135314",
+            appId: "1:886699135314:web:c12cef0949f3c452daaa8b",
+            measurementId: "G-2WJ8E16HGF"
         };
 
         // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
 
         let listaEstudiantesLocal = {};
         const mallaNivel1 = ["Matematicas", "Fisica", "Programacion"];
 
         // Escuchar cambios en tiempo real desde Firestore
-        db.collection("estudiantes").onSnapshot((snapshot) => {
+        onSnapshot(collection(db, "estudiantes"), (snapshot) => {
             listaEstudiantesLocal = {};
             snapshot.forEach((doc) => {
                 listaEstudiantesLocal[doc.id] = doc.data();
             });
             actualizarSelects();
             
-            // Si hay un estudiante seleccionado actualmente en el reporte, refrescar sus datos
+            // Refrescar datos si hay alguien seleccionado
             const seleccionado = document.getElementById('analisis-estudiante').value;
             if (seleccionado) {
                 generarReporte(seleccionado);
@@ -159,13 +166,14 @@
             if (!nombre) return;
 
             try {
-                const docRef = db.collection("estudiantes").doc(nombre);
-                const docSnap = await docRef.get();
+                const docRef = doc(db, "estudiantes", nombre);
+                const docSnap = await getDoc(docRef);
 
-                if (docSnap.exists) {
+                if (docSnap.exists()) {
                     msg.innerHTML = `<span class="error">El estudiante ya está registrado.</span>`;
                 } else {
-                    await docRef.set({
+                    // Crear nuevo documento
+                    await setDoc(docRef, {
                         nombre: nombre,
                         horarios: []
                     });
@@ -173,7 +181,8 @@
                     document.getElementById('nombre-estudiante').value = '';
                 }
             } catch (err) {
-                msg.innerHTML = `<span class="error">Error al guardar: ${err.message}</span>`;
+                msg.innerHTML = `<span class="error">Error al guardar: Asegúrate de habilitar Firestore (Paso 3)</span>`;
+                console.error(err);
             }
         });
 
@@ -224,12 +233,14 @@
                 horariosActuales.push(nuevoHorario);
 
                 try {
-                    await db.collection("estudiantes").doc(estudiante).update({
+                    const docRef = doc(db, "estudiantes", estudiante);
+                    await updateDoc(docRef, {
                         horarios: horariosActuales
                     });
                     msg.innerHTML = `<span class="success">Clase asignada exitosamente.</span>`;
                 } catch (err) {
-                    msg.innerHTML = `<span class="error">Error al actualizar horario: ${err.message}</span>`;
+                    msg.innerHTML = `<span class="error">Error al actualizar horario.</span>`;
+                    console.error(err);
                 }
             }
         });
