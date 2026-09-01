@@ -451,7 +451,10 @@
             const selAsig = document.getElementById('select-asignatura');
             const valAsig = selAsig.value;
             selAsig.innerHTML = '<option value="">-- Seleccione --</option>';
-            Object.keys(listaAsignaturasLocal).forEach(k => selAsig.innerHTML += `<option value="${k}">${k} (Nivel ${listaAsignaturasLocal[k].nivel})</option>`);
+            Object.keys(listaAsignaturasLocal).forEach(k => {
+                const asig = listaAsignaturasLocal[k];
+                selAsig.innerHTML += `<option value="${k}">${asig.nombre} (Nivel ${asig.nivel})</option>`;
+            });
             selAsig.value = valAsig;
         }
 
