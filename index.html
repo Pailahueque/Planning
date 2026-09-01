@@ -5,49 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma de Planificación Docente</title>
     <style>
+        :root {
+            --primary: #3498db;
+            --primary-hover: #2980b9;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #1abc9c;
+            --dark: #2c3e50;
+            --light: #f4f7f6;
+            --border: #dfe4ea;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: var(--light);
             color: #333;
             margin: 0;
             padding: 20px;
         }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
-        h2 { color: #2c3e50; margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
+        h1 { text-align: center; color: var(--dark); margin-bottom: 20px; }
+        h2 { color: var(--dark); margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
         
         /* Sistema de Pestañas */
         .tabs {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
             margin-bottom: 20px;
             max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto 20px auto;
         }
         .tab-button {
-            padding: 12px 24px;
+            padding: 12px 20px;
             background-color: #e0e0e0;
             border: none;
-            border-radius: 6px 6px 0 0;
+            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
             color: #555;
             transition: all 0.3s;
         }
-        .tab-button.active {
-            background-color: #3498db;
-            color: white;
-        }
+        .tab-button.active { background-color: var(--primary); color: white; }
 
-        .tab-content {
-            display: none;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .tab-content.active {
-            display: grid;
-        }
+        .tab-content { display: none; max-width: 1200px; margin: 0 auto; }
+        .tab-content.active { display: grid; }
 
         .grid-container {
             display: grid;
@@ -55,130 +58,87 @@
             gap: 20px;
             width: 100%;
         }
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-        }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .full-width { grid-column: 1 / -1; }
         
+        /* Formularios */
         form { display: flex; flex-direction: column; gap: 10px; }
         label { font-weight: bold; font-size: 0.9rem; margin-top: 5px; }
-        input[type="text"], select, button {
-            padding: 9px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.95rem;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-        button:hover { background-color: #2980b9; }
-        .btn-danger {
-            background-color: #e74c3c;
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            margin-top: 0;
-        }
-        .btn-danger:hover { background-color: #c0392b; }
-        .btn-warning {
-            background-color: #f39c12;
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            margin-top: 0;
-        }
-        .btn-warning:hover { background-color: #d68910; }
-
-        .sub-group {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid #3498db;
-            margin-bottom: 8px;
-        }
+        input[type="text"], select, button { padding: 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+        button { background-color: var(--primary); color: white; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; transition: 0.2s; }
+        button:hover { background-color: var(--primary-hover); }
+        
+        .btn-small { padding: 5px 10px; font-size: 0.8rem; margin-top: 0; border-radius: 4px; color: white; cursor: pointer; border: none; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-warning { background-color: var(--warning); }
+        
+        .sub-group { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid var(--primary); margin-bottom: 8px; }
         .sub-group h4 { margin: 0 0 8px 0; color: #34495e; font-size: 0.95rem; }
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
+        .checkbox-container { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
         
-        /* Barra de Progreso */
-        .progress-box {
-            background: #f1f2f6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #dfe4ea;
-        }
-        .progress-bar-bg {
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            height: 22px;
-            width: 100%;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        .progress-bar-fill {
-            background-color: #2ecc71;
-            height: 100%;
-            width: 0%;
-            text-align: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.85rem;
-            line-height: 22px;
-            transition: width 0.5s ease-in-out;
-        }
+        /* Progress Bar */
+        .progress-box { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .progress-bar-bg { background-color: #e0e0e0; border-radius: 10px; height: 22px; width: 100%; overflow: hidden; margin-top: 8px; }
+        .progress-bar-fill { background-color: var(--success); height: 100%; text-align: center; color: white; font-weight: bold; font-size: 0.85rem; line-height: 22px; transition: width 0.5s ease-in-out; }
 
-        .error { color: #e74c3c; font-weight: bold; margin-top: 10px; }
-        .success { color: #27ae60; font-weight: bold; margin-top: 10px; }
-        .warning { color: #f39c12; font-weight: bold; margin-top: 10px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .error { color: var(--danger); font-weight: bold; margin-top: 10px; display: block; }
+        .success { color: var(--success); font-weight: bold; margin-top: 10px; display: block; }
+
+        /* Tablas y Badges */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.9rem; }
         th { background-color: #f2f2f2; }
+        
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; text-transform: uppercase; }
+        .bg-cursando { background-color: var(--primary); }
+        .bg-cursada { background-color: var(--success); }
+        .bg-convalidada { background-color: var(--info); }
+        .bg-reprobada { background-color: var(--danger); }
+
+        /* Horario Visual */
+        .horario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px; }
+        .horario-dia { background: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden;}
+        .horario-dia h4 { background: var(--dark); color: white; margin: 0; padding: 10px; text-align: center; font-size: 1rem; }
+        .horario-content { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .clase-item { background: #e8f4f8; padding: 10px; border-radius: 4px; border-left: 4px solid var(--primary); font-size: 0.85rem; }
+        .clase-time { font-weight: bold; display: block; color: var(--dark); margin-bottom: 4px; }
+        .clase-name { display: block; font-weight: 600; color: #333; }
+        .clase-type { font-size: 0.75rem; color: #7f8c8d; }
+        .clase-vacia { color: #aaa; text-align: center; font-style: italic; font-size: 0.9rem; padding: 15px 0; }
     </style>
 </head>
 <body>
 
     <h1>Plataforma de Planificación Docente</h1>
 
+    <!-- PESTAÑAS -->
     <div class="tabs">
         <button class="tab-button active" data-tab="tab-registro">1. Registro & Asignaturas</button>
-        <button class="tab-button" data-tab="tab-inscripcion">2. Inscribir Estudiante</button>
-        <button class="tab-button" data-tab="tab-avance">3. Estado & Avance de Estudiantes</button>
+        <button class="tab-button" data-tab="tab-inscripcion">2. Gestión Académica (Inscripción)</button>
+        <button class="tab-button" data-tab="tab-avance">3. Avance & Malla</button>
+        <button class="tab-button" data-tab="tab-horario">4. Horario Semanal</button>
     </div>
 
+    <!-- TAB 1: REGISTRO -->
     <div id="tab-registro" class="tab-content active">
         <div class="grid-container">
             <div class="card">
                 <h2>Registrar Estudiante</h2>
                 <form id="form-estudiante">
-                    <label for="nombre-estudiante">Nombre del Estudiante:</label>
+                    <label>Nombre del Estudiante:</label>
                     <input type="text" id="nombre-estudiante" required placeholder="Ej. Juan Pérez">
                     <button type="submit">Guardar Estudiante</button>
                 </form>
-                <p id="msg-estudiante"></p>
+                <div id="msg-estudiante"></div>
             </div>
 
             <div class="card">
                 <h2>Crear Nueva Asignatura</h2>
                 <form id="form-asignatura">
-                    <label for="nombre-asignatura">Nombre Asignatura:</label>
+                    <label>Nombre Asignatura:</label>
                     <input type="text" id="nombre-asignatura" required placeholder="Ej. Física II">
 
-                    <label for="nivel-asignatura">Nivel al que pertenece:</label>
+                    <label>Nivel al que pertenece:</label>
                     <select id="nivel-asignatura" required>
                         <option value="1">Nivel 1</option>
                         <option value="2">Nivel 2</option>
@@ -186,7 +146,7 @@
                     </select>
 
                     <div class="sub-group">
-                        <h4>Clase Teórica (Obligatoria - Lun a Vie)</h4>
+                        <h4>Clase Teórica (Obligatoria)</h4>
                         <div style="display:flex; gap: 5px; flex-wrap: wrap;">
                             <select id="dia-teoria" required>
                                 <option value="Lunes">Lunes</option>
@@ -196,7 +156,7 @@
                                 <option value="Viernes">Viernes</option>
                             </select>
                             <select id="bloque-teoria" required>
-                                <option value="19:00-21:00">19:00 - 21:00 hrs (Bloque Completo)</option>
+                                <option value="19:00-21:00">19:00 - 21:00 hrs (Completo)</option>
                                 <option value="19:00-20:00">19:00 - 20:00 hrs</option>
                                 <option value="20:00-21:00">20:00 - 21:00 hrs</option>
                             </select>
@@ -205,8 +165,7 @@
 
                     <div class="sub-group">
                         <label class="checkbox-container">
-                            <input type="checkbox" id="check-ejercicios" checked>
-                            Incluir Clase de Ejercicios (Lun - Vie)
+                            <input type="checkbox" id="check-ejercicios" checked> Incluir Ejercicios
                         </label>
                         <div id="box-ejercicios" style="display:flex; gap: 5px; margin-top: 8px;">
                             <select id="dia-ejercicios">
@@ -222,87 +181,89 @@
 
                     <div class="sub-group">
                         <label class="checkbox-container">
-                            <input type="checkbox" id="check-lab">
-                            Incluir Clase de Laboratorio
+                            <input type="checkbox" id="check-lab"> Incluir Laboratorio
                         </label>
                         <div id="box-lab" style="display:none; flex-direction:column; gap: 8px; margin-top: 8px;">
-                            <label style="font-size:0.85rem;">Modalidad de Horario:</label>
                             <select id="modalidad-lab">
-                                <option value="Sabado">Sábados (Bloques Mañana)</option>
-                                <option value="Semana">Lunes a Viernes (21:00 - 22:00 hrs)</option>
+                                <option value="Sabado">Sábados (Mañana)</option>
+                                <option value="Semana">Lunes a Viernes (21:00 - 22:00)</option>
                             </select>
-
-                            <div id="sub-box-lab-sabado" style="display:flex; gap: 5px;">
+                            <div id="sub-box-lab-sabado" style="display:flex;">
                                 <select id="bloque-lab-sabado">
                                     <option value="08:00-09:45">08:00 - 09:45 hrs</option>
                                     <option value="09:45-11:30">09:45 - 11:30 hrs</option>
                                     <option value="11:30-13:15">11:30 - 13:15 hrs</option>
-                                    <option value="12:45-14:30">12:45 - 14:30 hrs</option>
                                 </select>
                             </div>
-
                             <div id="sub-box-lab-semana" style="display:none; gap: 5px;">
                                 <select id="dia-lab-semana">
                                     <option value="Lunes">Lunes</option>
-                                    <option value="Martes">Martes</option>
-                                    <option value="Miercoles">Miércoles</option>
-                                    <option value="Jueves">Jueves</option>
                                     <option value="Viernes" selected>Viernes</option>
                                 </select>
                                 <input type="text" value="21:00 - 22:00 hrs" disabled style="background:#e9ecef; width:130px;">
                             </div>
                         </div>
                     </div>
-
                     <button type="submit">Guardar Asignatura</button>
                 </form>
-                <p id="msg-asignatura"></p>
+                <div id="msg-asignatura"></div>
             </div>
         </div>
     </div>
 
+    <!-- TAB 2: INSCRIPCIÓN / ESTADOS -->
     <div id="tab-inscripcion" class="tab-content">
         <div class="grid-container">
             <div class="card full-width" style="max-width: 600px; margin: 0 auto;">
-                <h2>Inscribir Estudiante en Asignatura</h2>
+                <h2>Asignar Asignatura a Estudiante</h2>
                 <form id="form-inscripcion">
-                    <label for="select-estudiante">Seleccionar Estudiante:</label>
-                    <select id="select-estudiante" required>
-                        <option value="">-- Cargando... --</option>
+                    <label>Seleccionar Estudiante:</label>
+                    <select id="select-estudiante" required></select>
+
+                    <label>Seleccionar Asignatura:</label>
+                    <select id="select-asignatura" required></select>
+
+                    <label>Estado de la Asignatura:</label>
+                    <select id="select-estado" required>
+                        <option value="Cursando">Cursando Actualmente (Ocupa Horario)</option>
+                        <option value="Cursada">Cursada y Aprobada (Histórico)</option>
+                        <option value="Convalidada">Convalidada (Histórico)</option>
+                        <option value="Reprobada">Reprobada (Histórico)</option>
                     </select>
 
-                    <label for="select-asignatura">Seleccionar Asignatura a Inscribir:</label>
-                    <select id="select-asignatura" required>
-                        <option value="">-- Cargando... --</option>
-                    </select>
-
-                    <button type="submit">Inscribir Asignatura</button>
+                    <button type="submit">Registrar Asignatura</button>
                 </form>
-                <p id="msg-inscripcion"></p>
+                <div id="msg-inscripcion"></div>
             </div>
         </div>
     </div>
 
+    <!-- TAB 3: AVANCE -->
     <div id="tab-avance" class="tab-content">
         <div class="grid-container">
             <div class="card full-width">
-                <h2>Estado del Estudiante y Control de Malla</h2>
-                
-                <div style="max-width: 400px; margin-bottom: 20px;">
-                    <label for="analisis-estudiante">Seleccionar Estudiante:</label>
-                    <select id="analisis-estudiante">
-                        <option value="">-- Seleccione un estudiante --</option>
-                    </select>
-                </div>
-
+                <h2>Estado y Avance de Estudiantes</h2>
+                <label>Seleccionar Estudiante:</label>
+                <select id="analisis-estudiante" style="max-width: 300px; margin-bottom: 20px;"></select>
                 <div id="reporte-estudiante"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: HORARIO -->
+    <div id="tab-horario" class="tab-content">
+        <div class="grid-container">
+            <div class="card full-width">
+                <h2>Horario Semanal</h2>
+                <label>Seleccionar Estudiante:</label>
+                <select id="horario-estudiante" style="max-width: 300px; margin-bottom: 20px;"></select>
+                <div id="contenedor-horario"></div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -311,416 +272,265 @@
             projectId: "prog-docente",
             storageBucket: "prog-docente.firebasestorage.app",
             messagingSenderId: "886699135314",
-            appId: "1:886699135314:web:c12cef0949f3c452daaa8b",
-            measurementId: "G-2WJ8E16HGF"
+            appId: "1:886699135314:web:c12cef0949f3c452daaa8b"
         };
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
         let listaEstudiantesLocal = {};
         let listaAsignaturasLocal = {};
 
-        // SISTEMA DE PESTAÑAS (EventListeners directos en JS)
+        // SISTEMA DE PESTAÑAS
         document.querySelectorAll('.tab-button').forEach(button => {
             button.addEventListener('click', (e) => {
-                const targetTab = e.currentTarget.getAttribute('data-tab');
-
-                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-                document.querySelectorAll('.tab-button').forEach(tb => tb.classList.remove('active'));
-
-                document.getElementById(targetTab).classList.add('active');
+                const target = e.currentTarget.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content, .tab-button').forEach(el => el.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
                 e.currentTarget.classList.add('active');
             });
         });
 
-        // Alternar visibilidad de Ejercicios y Laboratorio
-        document.getElementById('check-ejercicios').addEventListener('change', function() {
-            document.getElementById('box-ejercicios').style.display = this.checked ? 'flex' : 'none';
+        // UI toggles
+        document.getElementById('check-ejercicios').addEventListener('change', e => document.getElementById('box-ejercicios').style.display = e.target.checked ? 'flex' : 'none');
+        document.getElementById('check-lab').addEventListener('change', e => document.getElementById('box-lab').style.display = e.target.checked ? 'flex' : 'none');
+        document.getElementById('modalidad-lab').addEventListener('change', e => {
+            document.getElementById('sub-box-lab-sabado').style.display = e.target.value === 'Sabado' ? 'flex' : 'none';
+            document.getElementById('sub-box-lab-semana').style.display = e.target.value === 'Semana' ? 'flex' : 'none';
         });
 
-        document.getElementById('check-lab').addEventListener('change', function() {
-            document.getElementById('box-lab').style.display = this.checked ? 'flex' : 'none';
-        });
-
-        document.getElementById('modalidad-lab').addEventListener('change', function() {
-            if (this.value === 'Sabado') {
-                document.getElementById('sub-box-lab-sabado').style.display = 'flex';
-                document.getElementById('sub-box-lab-semana').style.display = 'none';
-            } else {
-                document.getElementById('sub-box-lab-sabado').style.display = 'none';
-                document.getElementById('sub-box-lab-semana').style.display = 'flex';
-            }
-        });
-
-        // Escuchar cambios en tiempo real desde Firestore
+        // ESCUCHA DE FIRESTORE
         onSnapshot(collection(db, "estudiantes"), (snapshot) => {
             listaEstudiantesLocal = {};
-            snapshot.forEach((doc) => {
-                listaEstudiantesLocal[doc.id] = doc.data();
-            });
+            snapshot.forEach(doc => { listaEstudiantesLocal[doc.id] = doc.data(); });
             actualizarSelects();
-            refrescarVista();
+            refrescarVistaAvance();
+            refrescarHorario();
         });
 
         onSnapshot(collection(db, "asignaturas"), (snapshot) => {
             listaAsignaturasLocal = {};
-            snapshot.forEach((doc) => {
-                listaAsignaturasLocal[doc.id] = doc.data();
-            });
+            snapshot.forEach(doc => { listaAsignaturasLocal[doc.id] = doc.data(); });
             actualizarSelects();
-            refrescarVista();
+            refrescarVistaAvance();
         });
 
         // 1. REGISTRAR ESTUDIANTE
-        document.getElementById('form-estudiante').addEventListener('submit', async function(e) {
+        document.getElementById('form-estudiante').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nombre = document.getElementById('nombre-estudiante').value.trim();
             const msg = document.getElementById('msg-estudiante');
-
             if (!nombre) return;
-
             try {
                 const docRef = doc(db, "estudiantes", nombre);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
+                if ((await getDoc(docRef)).exists()) {
                     msg.innerHTML = `<span class="error">El estudiante ya existe.</span>`;
                 } else {
-                    await setDoc(docRef, {
-                        nombre: nombre,
-                        horarios: []
-                    });
-                    msg.innerHTML = `<span class="success">Estudiante ${nombre} registrado exitosamente.</span>`;
-                    document.getElementById('nombre-estudiante').value = '';
+                    await setDoc(docRef, { nombre, inscripciones: [] });
+                    msg.innerHTML = `<span class="success">Estudiante registrado exitosamente.</span>`;
+                    e.target.reset();
                 }
-            } catch (err) {
-                msg.innerHTML = `<span class="error">Error al guardar estudiante.</span>`;
-                console.error(err);
-            }
+            } catch (err) { msg.innerHTML = `<span class="error">Error al guardar.</span>`; }
         });
 
-        // 2. CREAR ASIGNATURA CON OPCIONES DE LAB FLEXIBLE
-        document.getElementById('form-asignatura').addEventListener('submit', async function(e) {
+        // 2. CREAR ASIGNATURA
+        document.getElementById('form-asignatura').addEventListener('submit', async (e) => {
             e.preventDefault();
             const nombre = document.getElementById('nombre-asignatura').value.trim();
             const nivel = document.getElementById('nivel-asignatura').value;
-            const msg = document.getElementById('msg-asignatura');
-
-            const tieneEjercicios = document.getElementById('check-ejercicios').checked;
-            const tieneLab = document.getElementById('check-lab').checked;
-
-            const clases = [];
-
-            // Teórica
-            clases.push({
-                tipo: "Teórica",
-                dia: document.getElementById('dia-teoria').value,
-                bloque: document.getElementById('bloque-teoria').value
-            });
-
-            // Ejercicios
-            if (tieneEjercicios) {
-                clases.push({
-                    tipo: "Ejercicios",
-                    dia: document.getElementById('dia-ejercicios').value,
-                    bloque: "21:00-22:00"
+            const clases = [{ tipo: "Teórica", dia: document.getElementById('dia-teoria').value, bloque: document.getElementById('bloque-teoria').value }];
+            
+            if (document.getElementById('check-ejercicios').checked)
+                clases.push({ tipo: "Ejercicios", dia: document.getElementById('dia-ejercicios').value, bloque: "21:00-22:00" });
+            
+            if (document.getElementById('check-lab').checked) {
+                const mod = document.getElementById('modalidad-lab').value;
+                clases.push({ 
+                    tipo: "Laboratorio", 
+                    dia: mod === 'Sabado' ? 'Sabado' : document.getElementById('dia-lab-semana').value, 
+                    bloque: mod === 'Sabado' ? document.getElementById('bloque-lab-sabado').value : "21:00-22:00" 
                 });
-            }
-
-            // Laboratorio
-            if (tieneLab) {
-                const modalidad = document.getElementById('modalidad-lab').value;
-                if (modalidad === 'Sabado') {
-                    clases.push({
-                        tipo: "Laboratorio",
-                        dia: "Sabado",
-                        bloque: document.getElementById('bloque-lab-sabado').value
-                    });
-                } else {
-                    clases.push({
-                        tipo: "Laboratorio",
-                        dia: document.getElementById('dia-lab-semana').value,
-                        bloque: "21:00-22:00"
-                    });
-                }
             }
 
             try {
-                const docRef = doc(db, "asignaturas", nombre);
-                await setDoc(docRef, {
-                    nombre: nombre,
-                    nivel: nivel,
-                    clases: clases
-                });
-                msg.innerHTML = `<span class="success">Asignatura "${nombre}" guardada correctamente.</span>`;
-                document.getElementById('nombre-asignatura').value = '';
-            } catch (err) {
-                msg.innerHTML = `<span class="error">Error al guardar la asignatura.</span>`;
-                console.error(err);
-            }
+                await setDoc(doc(db, "asignaturas", nombre), { nombre, nivel, clases });
+                document.getElementById('msg-asignatura').innerHTML = `<span class="success">Asignatura guardada.</span>`;
+                e.target.reset();
+            } catch (err) { document.getElementById('msg-asignatura').innerHTML = `<span class="error">Error al guardar.</span>`; }
         });
 
-        // Funciones auxiliares para traslape de horario
-        function parseMinutes(timeStr) {
-            const [h, m] = timeStr.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        function hayTopeHorario(dia1, bloqueStr1, dia2, bloqueStr2) {
+        // Utilidades de horario
+        const parseMinutes = (str) => { const [h, m] = str.split(':').map(Number); return h * 60 + m; };
+        const hayTope = (dia1, b1, dia2, b2) => {
             if (dia1 !== dia2) return false;
-            const [inicio1, fin1] = bloqueStr1.split('-').map(parseMinutes);
-            const [inicio2, fin2] = bloqueStr2.split('-').map(parseMinutes);
-            return Math.max(inicio1, inicio2) < Math.min(fin1, fin2);
-        }
+            const [i1, f1] = b1.split('-').map(parseMinutes);
+            const [i2, f2] = b2.split('-').map(parseMinutes);
+            return Math.max(i1, i2) < Math.min(f1, f2);
+        };
 
-        // 3. INSCRIBIR ASIGNATURA
-        document.getElementById('form-inscripcion').addEventListener('submit', async function(e) {
+        // 3. INSCRIBIR/ACTUALIZAR ASIGNATURA (NUEVA LOGICA DE ESTADOS)
+        document.getElementById('form-inscripcion').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const estudianteId = document.getElementById('select-estudiante').value;
-            const asignaturaId = document.getElementById('select-asignatura').value;
+            const estId = document.getElementById('select-estudiante').value;
+            const asigId = document.getElementById('select-asignatura').value;
+            const estado = document.getElementById('select-estado').value;
             const msg = document.getElementById('msg-inscripcion');
 
-            if (!estudianteId || !listaEstudiantesLocal[estudianteId] || !asignaturaId || !listaAsignaturasLocal[asignaturaId]) {
-                msg.innerHTML = `<span class="error">Selección no válida.</span>`;
-                return;
-            }
+            if (!estId || !asigId) return;
+            const estData = listaEstudiantesLocal[estId];
+            const asigData = listaAsignaturasLocal[asigId];
+            let inscripciones = estData.inscripciones || [];
 
-            const estudianteData = listaEstudiantesLocal[estudianteId];
-            const asignaturaData = listaAsignaturasLocal[asignaturaId];
-            const horariosInscritos = estudianteData.horarios || [];
-
-            if (horariosInscritos.some(h => h.asignatura === asignaturaId)) {
-                msg.innerHTML = `<span class="error">El estudiante ya tiene inscrita la asignatura "${asignaturaId}".</span>`;
-                return;
-            }
-
-            let conflicto = null;
-            for (let claseNueva of asignaturaData.clases) {
-                for (let inscrita of horariosInscritos) {
-                    if (hayTopeHorario(claseNueva.dia, claseNueva.bloque, inscrita.dia, inscrita.bloque)) {
-                        conflicto = { nueva: claseNueva, existente: inscrita };
-                        break;
+            // Si la está cursando actualmente, revisar topes con otras "Cursando"
+            if (estado === 'Cursando') {
+                let conflicto = null;
+                for (let nueva of asigData.clases) {
+                    for (let insc of inscripciones) {
+                        if (insc.asignatura === asigId || insc.estado !== 'Cursando') continue;
+                        for (let ext of insc.clases) {
+                            if (hayTope(nueva.dia, nueva.bloque, ext.dia, ext.bloque)) {
+                                conflicto = `Tope: ${nueva.tipo} (${nueva.dia} ${nueva.bloque}) choca con ${insc.asignatura} (${ext.dia} ${ext.bloque})`;
+                                break;
+                            }
+                        }
+                        if (conflicto) break;
                     }
+                    if (conflicto) break;
                 }
-                if (conflicto) break;
+                if (conflicto) {
+                    msg.innerHTML = `<span class="error">Error de Horario: ${conflicto}</span>`;
+                    return;
+                }
             }
 
-            if (conflicto) {
-                const cn = conflicto.nueva;
-                const ex = conflicto.existente;
-                msg.innerHTML = `<span class="error">¡TOPE DE HORARIO DETECTADO!<br>` +
-                    `La clase de ${cn.tipo} de ${asignaturaId} (${cn.dia} ${cn.bloque} hrs) choca con la clase de ` +
-                    `${ex.tipoClase} de ${ex.asignatura} (${ex.dia} ${ex.bloque} hrs).</span>`;
-                return;
-            }
-
-            const nuevosBloques = asignaturaData.clases.map(c => ({
-                asignatura: asignaturaData.nombre,
-                nivel: asignaturaData.nivel,
-                tipoClase: c.tipo,
-                dia: c.dia,
-                bloque: c.bloque
-            }));
+            // Filtrar para reemplazar si ya existía
+            inscripciones = inscripciones.filter(i => i.asignatura !== asigId);
+            inscripciones.push({ asignatura: asigId, nivel: asigData.nivel, estado: estado, clases: asigData.clases });
 
             try {
-                const docRef = doc(db, "estudiantes", estudianteId);
-                await updateDoc(docRef, {
-                    horarios: [...horariosInscritos, ...nuevosBloques]
-                });
-                msg.innerHTML = `<span class="success">¡Asignatura "${asignaturaId}" inscrita exitosamente!</span>`;
-            } catch (err) {
-                msg.innerHTML = `<span class="error">Error al inscribir la asignatura.</span>`;
-                console.error(err);
-            }
+                await updateDoc(doc(db, "estudiantes", estId), { inscripciones });
+                msg.innerHTML = `<span class="success">Estado "${estado}" registrado para ${asigId}.</span>`;
+            } catch (err) { msg.innerHTML = `<span class="error">Error de registro.</span>`; }
         });
 
-        // FUNCIONALIDAD: ELIMINAR ASIGNATURA DE UN ESTUDIANTE
-        window.eliminarAsignaturaEstudiante = async function(estudianteId, nombreAsignatura) {
-            if (!confirm(`¿Está seguro de eliminar la asignatura "${nombreAsignatura}" de ${estudianteId}?`)) return;
+        // FUNCIONES GLOBALES (Llamadas desde el HTML renderizado)
+        window.eliminarRegistro = async (estId, asigId) => {
+            if (!confirm(`¿Eliminar ${asigId} del historial de ${estId}?`)) return;
+            const insc = (listaEstudiantesLocal[estId].inscripciones || []).filter(i => i.asignatura !== asigId);
+            await updateDoc(doc(db, "estudiantes", estId), { inscripciones: insc });
+        };
 
-            const estudianteData = listaEstudiantesLocal[estudianteId];
-            if (!estudianteData) return;
-
-            const nuevosHorarios = (estudianteData.horarios || []).filter(h => h.asignatura !== nombreAsignatura);
-
-            try {
-                const docRef = doc(db, "estudiantes", estudianteId);
-                await updateDoc(docRef, { horarios: nuevosHorarios });
-            } catch (err) {
-                alert("Error al eliminar la asignatura: " + err.message);
+        window.cambiarEstado = async (estId, asigId) => {
+            const nuevo = prompt(`Nuevo estado para ${asigId} (Cursando, Cursada, Convalidada, Reprobada):`);
+            if (!nuevo || !['Cursando', 'Cursada', 'Convalidada', 'Reprobada'].includes(nuevo)) return alert('Estado inválido.');
+            // Para "Cursando", idealmente debe pasar por validación de tope. Por seguridad instamos a usar la pestaña 2.
+            if(nuevo === 'Cursando') { alert("Para 'Cursando', usa la pestaña de Inscripción para validar topes de horario."); return; }
+            
+            const insc = listaEstudiantesLocal[estId].inscripciones || [];
+            const idx = insc.findIndex(i => i.asignatura === asigId);
+            if(idx > -1) {
+                insc[idx].estado = nuevo;
+                await updateDoc(doc(db, "estudiantes", estId), { inscripciones: insc });
             }
         };
 
-        // FUNCIONALIDAD: MODIFICAR / CAMBIAR ASIGNATURA
-        window.modificarAsignaturaEstudiante = async function(estudianteId, nombreAsignaturaAnterior) {
-            const nuevaAsignatura = prompt(`Ingrese el nombre de la nueva asignatura para reemplazar "${nombreAsignaturaAnterior}":\nOpciones disponibles: ${Object.keys(listaAsignaturasLocal).join(', ')}`);
-            
-            if (!nuevaAsignatura || !listaAsignaturasLocal[nuevaAsignatura]) {
-                if (nuevaAsignatura) alert("La asignatura ingresada no existe en el sistema.");
-                return;
-            }
-
-            const estudianteData = listaEstudiantesLocal[estudianteId];
-            const horariosLimpios = (estudianteData.horarios || []).filter(h => h.asignatura !== nombreAsignaturaAnterior);
-            
-            const asignaturaNuevaData = listaAsignaturasLocal[nuevaAsignatura];
-
-            let conflicto = null;
-            for (let claseNueva of asignaturaNuevaData.clases) {
-                for (let inscrita of horariosLimpios) {
-                    if (hayTopeHorario(claseNueva.dia, claseNueva.bloque, inscrita.dia, inscrita.bloque)) {
-                        conflicto = { nueva: claseNueva, existente: inscrita };
-                        break;
-                    }
-                }
-                if (conflicto) break;
-            }
-
-            if (conflicto) {
-                alert(`No se puede reemplazar por "${nuevaAsignatura}". Genera tope de horario con ${conflicto.existente.asignatura} (${conflicto.existente.dia} ${conflicto.existente.bloque}).`);
-                return;
-            }
-
-            const nuevosBloques = asignaturaNuevaData.clases.map(c => ({
-                asignatura: asignaturaNuevaData.nombre,
-                nivel: asignaturaNuevaData.nivel,
-                tipoClase: c.tipo,
-                dia: c.dia,
-                bloque: c.bloque
-            }));
-
-            try {
-                const docRef = doc(db, "estudiantes", estudianteId);
-                await updateDoc(docRef, {
-                    horarios: [...horariosLimpios, ...nuevosBloques]
-                });
-                alert(`¡Se reemplazó "${nombreAsignaturaAnterior}" por "${nuevaAsignatura}" exitosamente!`);
-            } catch (err) {
-                alert("Error al modificar asignatura.");
-            }
-        };
-
+        // ACTUALIZACIONES DE UI
         function actualizarSelects() {
-            const selectEst = document.getElementById('select-estudiante');
-            const selectAsig = document.getElementById('select-asignatura');
-            const selectAna = document.getElementById('analisis-estudiante');
+            const ests = ['select-estudiante', 'analisis-estudiante', 'horario-estudiante'];
+            ests.forEach(id => {
+                const el = document.getElementById(id);
+                const val = el.value;
+                el.innerHTML = '<option value="">-- Seleccione --</option>';
+                Object.keys(listaEstudiantesLocal).forEach(k => el.innerHTML += `<option value="${k}">${k}</option>`);
+                el.value = val;
+            });
 
-            const valEst = selectEst.value;
-            const valAsig = selectAsig.value;
-            const valAna = selectAna.value;
-
-            selectEst.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-            selectAna.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-            for (let id in listaEstudiantesLocal) {
-                selectEst.innerHTML += `<option value="${id}">${id}</option>`;
-                selectAna.innerHTML += `<option value="${id}">${id}</option>`;
-            }
-
-            selectAsig.innerHTML = '<option value="">-- Seleccione una asignatura --</option>';
-            for (let id in listaAsignaturasLocal) {
-                const asig = listaAsignaturasLocal[id];
-                selectAsig.innerHTML += `<option value="${id}">${asig.nombre} (Nivel ${asig.nivel})</option>`;
-            }
-
-            selectEst.value = valEst;
-            selectAsig.value = valAsig;
-            selectAna.value = valAna;
+            const selAsig = document.getElementById('select-asignatura');
+            const valAsig = selAsig.value;
+            selAsig.innerHTML = '<option value="">-- Seleccione --</option>';
+            Object.keys(listaAsignaturasLocal).forEach(k => selAsig.innerHTML += `<option value="${k}">${k}</option>`);
+            selAsig.value = valAsig;
         }
 
-        document.getElementById('analisis-estudiante').addEventListener('change', refrescarVista);
+        document.getElementById('analisis-estudiante').addEventListener('change', refrescarVistaAvance);
+        document.getElementById('horario-estudiante').addEventListener('change', refrescarHorario);
 
-        function refrescarVista() {
-            const estudianteId = document.getElementById('analisis-estudiante').value;
-            const divReporte = document.getElementById('reporte-estudiante');
+        function refrescarVistaAvance() {
+            const estId = document.getElementById('analisis-estudiante').value;
+            const div = document.getElementById('reporte-estudiante');
+            if (!estId || !listaEstudiantesLocal[estId]) return div.innerHTML = '';
 
-            if (!estudianteId || !listaEstudiantesLocal[estudianteId]) {
-                divReporte.innerHTML = '';
-                return;
-            }
-
-            const estudiante = listaEstudiantesLocal[estudianteId];
-            const horarios = estudiante.horarios || [];
-
-            const asignaturasInscritas = [...new Set(horarios.map(h => h.asignatura))];
-            
-            const totalAsignaturasSistema = Object.keys(listaAsignaturasLocal).length;
-            const asignaturasNivel1Sistema = Object.values(listaAsignaturasLocal)
-                .filter(a => a.nivel === "1")
-                .map(a => a.nombre);
-
-            const faltantesNivel1 = asignaturasNivel1Sistema.filter(a => !asignaturasInscritas.includes(a));
-
-            const numInscritas = asignaturasInscritas.length;
-            const porcentajeAvance = totalAsignaturasSistema > 0 
-                ? Math.round((numInscritas / totalAsignaturasSistema) * 100) 
-                : 0;
+            const inscripciones = listaEstudiantesLocal[estId].inscripciones || [];
+            const aprobadas = inscripciones.filter(i => i.estado === 'Cursada' || i.estado === 'Convalidada').length;
+            const total = Object.keys(listaAsignaturasLocal).length;
+            const porcentaje = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
 
             let html = `
                 <div class="progress-box">
-                    <strong>Avance Curricular del Estudiante:</strong> ${numInscritas} de ${totalAsignaturasSistema} Asignaturas Registradas (${porcentajeAvance}%)
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${porcentajeAvance}%">${porcentajeAvance}%</div>
-                    </div>
+                    <strong>Progreso Real (Aprobadas/Convalidadas):</strong> ${aprobadas} de ${total} (${porcentaje}%)
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${porcentaje}%">${porcentaje}%</div></div>
                 </div>
-
-                <h3>Horario e Inscripciones de ${estudiante.nombre}</h3>
-            `;
-
-            if (horarios.length === 0) {
-                html += `<p>El estudiante no tiene asignaturas inscritas actualmente.</p>`;
-            } else {
-                html += `<table>
-                    <thead>
-                        <tr>
-                            <th>Asignatura</th>
-                            <th>Tipo de Clase</th>
-                            <th>Día</th>
-                            <th>Bloque Horario</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+                <h3>Historial Académico</h3>
+                <table>
+                    <thead><tr><th>Asignatura</th><th>Nivel</th><th>Estado</th><th>Acciones</th></tr></thead>
                     <tbody>`;
+            
+            inscripciones.forEach(ins => {
+                const colorClass = `bg-${ins.estado.toLowerCase()}`;
+                html += `<tr>
+                    <td><strong>${ins.asignatura}</strong></td>
+                    <td>Nivel ${ins.nivel}</td>
+                    <td><span class="badge ${colorClass}">${ins.estado}</span></td>
+                    <td>
+                        <button class="btn-small btn-warning" onclick="cambiarEstado('${estId}', '${ins.asignatura}')">Modificar Estado</button>
+                        <button class="btn-small btn-danger" onclick="eliminarRegistro('${estId}', '${ins.asignatura}')">X</button>
+                    </td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            div.innerHTML = inscripciones.length ? html : '<p>Sin asignaturas registradas.</p>';
+        }
+
+        // GENERADOR DE HORARIO
+        function refrescarHorario() {
+            const estId = document.getElementById('horario-estudiante').value;
+            const div = document.getElementById('contenedor-horario');
+            if (!estId || !listaEstudiantesLocal[estId]) return div.innerHTML = '';
+
+            const inscripciones = listaEstudiantesLocal[estId].inscripciones || [];
+            const cursando = inscripciones.filter(i => i.estado === 'Cursando');
+            
+            const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            let html = '<div class="horario-grid">';
+
+            dias.forEach(dia => {
+                html += `<div class="horario-dia"><h4>${dia}</h4><div class="horario-content">`;
                 
-                let ultimaAsignatura = "";
-                horarios.forEach(h => {
-                    const esPrimeraFila = h.asignatura !== ultimaAsignatura;
-                    ultimaAsignatura = h.asignatura;
+                let clasesDia = [];
+                cursando.forEach(ins => {
+                    ins.clases.forEach(c => {
+                        if (c.dia === dia) clasesDia.push({ ...c, asignatura: ins.asignatura });
+                    });
+                });
 
-                    html += `<tr>
-                        <td><strong>${h.asignatura}</strong></td>
-                        <td>${h.tipoClase}</td>
-                        <td>${h.dia}</td>
-                        <td>${h.bloque} hrs</td>
-                        <td>`;
-                    
-                    if (esPrimeraFila) {
+                // Ordenar por hora de inicio
+                clasesDia.sort((a, b) => parseMinutes(a.bloque.split('-')[0]) - parseMinutes(b.bloque.split('-')[0]));
+
+                if (clasesDia.length === 0) {
+                    html += `<div class="clase-vacia">Libre</div>`;
+                } else {
+                    clasesDia.forEach(c => {
                         html += `
-                            <button class="btn-warning" onclick="modificarAsignaturaEstudiante('${estudiante.nombre}', '${h.asignatura}')">Modificar</button>
-                            <button class="btn-danger" onclick="eliminarAsignaturaEstudiante('${estudiante.nombre}', '${h.asignatura}')">Eliminar</button>
-                        `;
-                    }
-                    
-                    html += `</td></tr>`;
-                });
-                html += `</tbody></table>`;
-            }
-
-            html += `<h3 style="margin-top: 25px;">Cumplimiento de Nivel 1</h3>`;
-            if (asignaturasNivel1Sistema.length === 0) {
-                html += `<p class="warning">No hay asignaturas de Nivel 1 registradas en el sistema.</p>`;
-            } else if (faltantesNivel1.length === 0) {
-                html += `<p class="success">✓ El estudiante cumple con todas las asignaturas requeridas para el Nivel 1.</p>`;
-            } else {
-                html += `<p class="warning">Asignaturas pendientes de Nivel 1 para completar la malla:</p><ul>`;
-                faltantesNivel1.forEach(f => {
-                    html += `<li class="error">${f}</li>`;
-                });
-                html += `</ul>`;
-            }
-
-            divReporte.innerHTML = html;
+                        <div class="clase-item">
+                            <span class="clase-time">${c.bloque} hrs</span>
+                            <span class="clase-name">${c.asignatura}</span>
+                            <span class="clase-type">${c.tipo}</span>
+                        </div>`;
+                    });
+                }
+                html += `</div></div>`;
+            });
+            div.innerHTML = html + '</div>';
         }
     </script>
 </body>
