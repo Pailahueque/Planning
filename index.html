@@ -91,7 +91,7 @@
         
         .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; color: white; text-transform: uppercase; }
         .bg-cursando { background-color: var(--primary); }
-        .bg-cursada { background-color: var(--success); }
+        .bg-aprobada { background-color: var(--success); }
         .bg-convalidada { background-color: var(--info); }
         .bg-reprobada { background-color: var(--danger); }
 
@@ -226,7 +226,7 @@
                     <label>Estado de la Asignatura:</label>
                     <select id="select-estado" required>
                         <option value="Cursando">Cursando Actualmente (Ocupa Horario)</option>
-                        <option value="Cursada">Cursada y Aprobada (Histórico)</option>
+                        <option value="Aprobada">Aprobada (Histórico)</option>
                         <option value="Convalidada">Convalidada (Histórico)</option>
                         <option value="Reprobada">Reprobada (Histórico)</option>
                     </select>
@@ -368,7 +368,7 @@
             return Math.max(i1, i2) < Math.min(f1, f2);
         };
 
-        // 3. INSCRIBIR/ACTUALIZAR ASIGNATURA (NUEVA LOGICA DE ESTADOS)
+        // 3. INSCRIBIR/ACTUALIZAR ASIGNATURA
         document.getElementById('form-inscripcion').addEventListener('submit', async (e) => {
             e.preventDefault();
             const estId = document.getElementById('select-estudiante').value;
@@ -413,7 +413,7 @@
             } catch (err) { msg.innerHTML = `<span class="error">Error de registro.</span>`; }
         });
 
-        // FUNCIONES GLOBALES (Llamadas desde el HTML renderizado)
+        // FUNCIONES GLOBALES
         window.eliminarRegistro = async (estId, asigId) => {
             if (!confirm(`¿Eliminar ${asigId} del historial de ${estId}?`)) return;
             const insc = (listaEstudiantesLocal[estId].inscripciones || []).filter(i => i.asignatura !== asigId);
@@ -421,9 +421,9 @@
         };
 
         window.cambiarEstado = async (estId, asigId) => {
-            const nuevo = prompt(`Nuevo estado para ${asigId} (Cursando, Cursada, Convalidada, Reprobada):`);
-            if (!nuevo || !['Cursando', 'Cursada', 'Convalidada', 'Reprobada'].includes(nuevo)) return alert('Estado inválido.');
-            // Para "Cursando", idealmente debe pasar por validación de tope. Por seguridad instamos a usar la pestaña 2.
+            const nuevo = prompt(`Nuevo estado para ${asigId} (Cursando, Aprobada, Convalidada, Reprobada):`);
+            if (!nuevo || !['Cursando', 'Aprobada', 'Convalidada', 'Reprobada'].includes(nuevo)) return alert('Estado inválido.');
+            
             if(nuevo === 'Cursando') { alert("Para 'Cursando', usa la pestaña de Inscripción para validar topes de horario."); return; }
             
             const insc = listaEstudiantesLocal[estId].inscripciones || [];
@@ -461,7 +461,7 @@
             if (!estId || !listaEstudiantesLocal[estId]) return div.innerHTML = '';
 
             const inscripciones = listaEstudiantesLocal[estId].inscripciones || [];
-            const aprobadas = inscripciones.filter(i => i.estado === 'Cursada' || i.estado === 'Convalidada').length;
+            const aprobadas = inscripciones.filter(i => i.estado === 'Aprobada' || i.estado === 'Convalidada').length;
             const total = Object.keys(listaAsignaturasLocal).length;
             const porcentaje = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
 
